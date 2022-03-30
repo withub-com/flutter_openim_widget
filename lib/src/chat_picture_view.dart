@@ -4,9 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_openim_widget/flutter_openim_widget.dart';
 
-import 'chat_itemview.dart';
-import 'chat_send_progress_view.dart';
-
 class ChatPictureView extends StatefulWidget {
   const ChatPictureView({
     Key? key,
@@ -60,15 +57,15 @@ class _ChatPictureViewState extends State<ChatPictureView> {
     var w = widget.width ?? 1.0;
     var h = widget.height ?? 1.0;
 
-    _trulyWidth = widget.widgetWidth;
-    _trulyHeight = _trulyWidth * h / w;
-    /*if (widget.widgetWidth > w) {
+    // _trulyWidth = widget.widgetWidth;
+    // _trulyHeight = _trulyWidth * h / w;
+    if (widget.widgetWidth > w) {
       _trulyWidth = w;
       _trulyHeight = h;
     } else {
       _trulyWidth = widget.widgetWidth;
       _trulyHeight = _trulyWidth * h / w;
-    }*/
+    }
 
     //
     /*if (!_isNotNull(_snapshotPath) && _isNotNull(_sourcePath)) {
@@ -111,7 +108,7 @@ class _ChatPictureViewState extends State<ChatPictureView> {
 
   bool _isClickedLocation(i) => i == widget.index;
 
-  Widget _urlView({required String url}) => IconUtil.networkImage(
+  Widget _urlView({required String url}) => ImageUtil.networkImage(
         url: url,
         height: _trulyHeight,
         width: _trulyWidth,
@@ -172,12 +169,12 @@ class _ChatPictureViewState extends State<ChatPictureView> {
   @override
   Widget build(BuildContext context) {
     var child = _buildChildView();
-    return child;
-    // return Hero(tag: widget.msgId, child: child);
+    // return child;
+    return Hero(tag: widget.msgId, child: child);
   }
 
   Widget _errorIcon() =>
-      IconUtil.error(width: _trulyWidth, height: _trulyHeight);
+      ImageUtil.error(width: _trulyWidth, height: _trulyHeight);
 
   static bool _isNotNull(String? value) =>
       null != value && value.trim().isNotEmpty;

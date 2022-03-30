@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 class UILocalizations {
   UILocalizations._();
 
-  static void setLocale(Locale? locale) {
-    UILocalizations._locale = locale ?? const Locale('zh');
+  static void set(Locale? locale) {
+    _locale = locale ?? const Locale('zh');
   }
+
+  static String _value({required String key}) =>
+      _localizedValues[_locale.languageCode]![key] ?? key;
 
   static Locale _locale = const Locale('zh');
 
@@ -26,7 +29,10 @@ class UILocalizations {
       "carte": "Contact Card",
       "voiceInput": "Voice Input",
       'haveRead': 'Have read',
+      'groupHaveRead': '%s people have read',
       'unread': 'Unread',
+      'groupUnread': '%s unread',
+      'allRead': 'All read',
       'copy': 'Copy',
       "delete": "Delete",
       "forward": "Forward",
@@ -47,9 +53,11 @@ class UILocalizations {
       "you": "You",
       "revokeAMsg": "revoke a message",
       "picLoadError": "Image failed to load",
-      "fileSize": "File size:%s",
+      "fileSize": "File size: %s",
       "fileUnavailable": "The file has expired or has been cleaned up",
       "send": 'Send',
+      "unsupportedMessage": '[Message types not supported]',
+      "add": 'Add',
     },
     'zh': {
       'top': '置顶',
@@ -67,7 +75,10 @@ class UILocalizations {
       "carte": "名片",
       "voiceInput": "语音输入",
       'haveRead': '已读',
+      'groupHaveRead': '%s人已读',
       'unread': '未读',
+      'groupUnread': '%s人未读',
+      'allRead': '全部已读',
       'copy': '复制',
       "delete": "删除",
       "forward": "转发",
@@ -91,6 +102,8 @@ class UILocalizations {
       "fileSize": "文件大小：%s",
       "fileUnavailable": "文件已过期或已被清理",
       "send": '发送',
+      "unsupportedMessage": '[暂不支持的消息类型]',
+      "add": '添加',
     },
   };
 
@@ -125,6 +138,12 @@ class UILocalizations {
   static String get haveRead => _value(key: 'haveRead');
 
   static String get unread => _value(key: 'unread');
+
+  static String get groupHaveRead => _value(key: 'groupHaveRead');
+
+  static String get groupUnread => _value(key: 'groupUnread');
+
+  static String get allRead => _value(key: 'allRead');
 
   static String get copy => _value(key: 'copy');
 
@@ -176,6 +195,7 @@ class UILocalizations {
 
   static String get send => _value(key: 'send');
 
-  static String _value({required String key}) =>
-      _localizedValues[_locale.languageCode]![key] ?? key;
+  static String get unsupportedMessage => _value(key: 'unsupportedMessage');
+
+  static String get add => _value(key: 'add');
 }

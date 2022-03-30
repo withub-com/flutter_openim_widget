@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 
-import 'permission_util.dart';
-
 typedef RecordFc = Function(int sec, String path);
 
 class VoiceRecord {
@@ -13,13 +11,13 @@ class VoiceRecord {
   late String _path;
   int _long = 0;
   late int _tag;
-  RecordFc callback;
+  RecordFc _callback;
   final _audioRecorder = Record();
 
-  VoiceRecord(this.callback) : _tag = DateTime.now().millisecondsSinceEpoch;
+  VoiceRecord(this._callback) : _tag = _now();
 
-  start() {
-    PermissionUtil.microphone(() async {
+  start() async {
+    if (await _audioRecorder.hasPermission()) {
       var path = (await getApplicationDocumentsDirectory()).path;
       _path = '$path/$_dir/$_tag$_ext';
       File file = File(_path);
@@ -28,17 +26,16 @@ class VoiceRecord {
       }
       _long = _now();
       _audioRecorder.start(path: _path);
-    });
-  }
-
-  stop() async {
-    _long = (_now() - _long) ~/ 1000;
-    bool isRecording = await _audioRecorder.isRecording();
-    if (isRecording) {
-      _audioRecorder.stop();
-      callback(_long, _path);
     }
   }
 
-  int _now() => DateTime.now().millisecondsSinceEpoch;
+  stop() async {
+    if (await _audioRecorder.isRecording()) {
+      _long = (_now() - _long) ~/ 1000;
+      _audioRecorder.stop();
+      _callback(_long, _path);
+    }
+  }
+
+  static int _now() => DateTime.now().millisecondsSinceEpoch;
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_openim_widget/flutter_openim_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'chat_linear_progress_indicator.dart';
 
@@ -113,8 +114,8 @@ class ChatFileView extends StatelessWidget {
     required this.fileName,
     required this.bytes,
     required this.index,
-    required this.filePath,
-    required this.url,
+    // required this.filePath,
+    // required this.url,
     this.clickStream,
     this.width = 158,
     this.initProgress = 100,
@@ -126,8 +127,8 @@ class ChatFileView extends StatelessWidget {
   final int initProgress;
   final Stream<MsgStreamEv<int>>? uploadStream;
   final double width;
-  final String filePath;
-  final String url;
+  // final String filePath;
+  // final String url;
   final int index;
   final Stream<int>? clickStream;
 
@@ -169,7 +170,12 @@ class ChatFileView extends StatelessWidget {
               SizedBox(
                 width: 10.w,
               ),
-              IconUtil.file(),
+              // ImageUtil.file(),
+              FaIcon(
+                CommonUtil.fileIcon(fileName),
+                size: 28,
+                color: Color(0xFF1b6bed),
+              )
             ],
           ),
           ChatLinearProgressView(

@@ -32,9 +32,9 @@ class AtSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
     if (kIsWeb) {
       return TextSpan(text: data, style: textStyle);
     }
-    if (allAtMap.isEmpty) {
-      return TextSpan(text: data, style: textStyle);
-    }
+    // if (allAtMap.isEmpty) {
+    //   return TextSpan(text: data, style: textStyle);
+    // }
     final List<InlineSpan> children = <InlineSpan>[];
 
     var regexEmoji = emojiFaces.keys
@@ -72,9 +72,9 @@ class AtSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
             }
           } else if (emojiReg.hasMatch(value)) {
             inlineSpan = ImageSpan(
-              IconUtil.emojiImage(value),
-              imageWidth: 20.h,
-              imageHeight: 20.h,
+              ImageUtil.emojiImage(value),
+              imageWidth: 15.h,
+              imageHeight: 15.h,
               start: m.start,
               actualText: '$value',
             );

@@ -2,10 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import '../../flutter_openim_widget.dart';
-import '../../src/chat_itemview.dart';
-import '../../src/chat_send_progress_view.dart';
+import 'package:flutter_openim_widget/flutter_openim_widget.dart';
 
 class ChatVideoView extends StatefulWidget {
   final String? videoPath;
@@ -87,7 +84,7 @@ class _ChatVideoViewState extends State<ChatVideoView> {
   Widget _buildThumbView() {
     if (widget.isReceived) {
       if (null != snapshotUrl && snapshotUrl!.isNotEmpty) {
-        return IconUtil.networkImage(
+        return ImageUtil.networkImage(
           url: snapshotUrl!,
           width: _trulyWidth,
           height: _trulyHeight,
@@ -107,7 +104,7 @@ class _ChatVideoViewState extends State<ChatVideoView> {
         );
       } else {
         if (null != snapshotUrl && snapshotUrl!.isNotEmpty) {
-          return IconUtil.networkImage(
+          return ImageUtil.networkImage(
             url: snapshotUrl!,
             width: _trulyWidth,
             height: _trulyHeight,
@@ -121,61 +118,29 @@ class _ChatVideoViewState extends State<ChatVideoView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: _trulyWidth,
-      height: _trulyHeight,
-      color: Color(0xFFB3D7FF),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          _buildThumbView(),
-          IconUtil.play(),
-          ChatSendProgressView(
-            height: _trulyHeight,
-            width: _trulyWidth,
-            msgId: widget.msgId,
-            stream: widget.msgSenProgressStream,
-            initProgress: widget.initMsgSendProgress,
+    return Hero(
+        tag: widget.msgId,
+        child: Container(
+          width: _trulyWidth,
+          height: _trulyHeight,
+          // color: Color(0xFFB3D7FF),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              _buildThumbView(),
+              ImageUtil.play(),
+              ChatSendProgressView(
+                height: _trulyHeight,
+                width: _trulyWidth,
+                msgId: widget.msgId,
+                stream: widget.msgSenProgressStream,
+                initProgress: widget.initMsgSendProgress,
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-    /*return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (BuildContext context) {
-              return ChatVideoPlayerView(
-                path: path,
-                url: url,
-              );
-            },
-          ),
-        );
-      },
-      child: Container(
-        width: _trulyWidth,
-        height: _trulyHeight,
-        color: Color(0xFFB3D7FF),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            _buildThumbView(),
-            WidgetsUtil.playIcon(),
-            ChatMsgSendProgressView(
-              height: _trulyHeight,
-              width: _trulyWidth,
-              msgId: widget.msgId,
-              stream: widget.msgSenProgressStream,
-              initProgress: widget.initMsgSendProgress,
-            ),
-          ],
-        ),
-      ),
-    );*/
+        ));
   }
 
   Widget _errorIcon() =>
-      IconUtil.error(width: _trulyWidth, height: _trulyHeight);
+      ImageUtil.error(width: _trulyWidth, height: _trulyHeight);
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_openim_widget/flutter_openim_widget.dart';
-import 'package:flutter_openim_widget/src/chat_bubble.dart';
+import 'package:flutter_openim_widget/src/timing_view.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:sprintf/sprintf.dart';
 
 class ChatSingleLayout extends StatelessWidget {
   final CustomPopupMenuController popupCtrl;
@@ -35,6 +36,13 @@ class ChatSingleLayout extends StatelessWidget {
   final bool showRadio;
   final Function(bool checked)? onRadioChanged;
   final bool delaySendingStatus;
+  final bool enabledReadStatus;
+  final Function()? onStartDestroy;
+  final int readingDuration;
+  final int haveReadCount;
+  final int needReadCount;
+  final Function()? viewMessageReadStatus;
+  final Function()? failedResend;
 
   const ChatSingleLayout({
     Key? key,
@@ -68,6 +76,13 @@ class ChatSingleLayout extends StatelessWidget {
     this.showRadio = false,
     this.onRadioChanged,
     this.delaySendingStatus = false,
+    this.enabledReadStatus = true,
+    this.readingDuration = 0,
+    this.onStartDestroy,
+    this.haveReadCount = 0,
+    this.needReadCount = 0,
+    this.viewMessageReadStatus,
+    this.failedResend,
   }) : super(key: key);
 
   @override
@@ -162,19 +177,8 @@ class ChatSingleLayout extends StatelessWidget {
   Widget _isToWidget() => Row(
         mainAxisAlignment: _layoutAlignment(),
         children: [
-          if (delaySendingStatus)
-            FutureBuilder(
-              future: Future.delayed(
-                Duration(seconds: (isSending && !isSendFailed) ? 1 : 0),
-                () => isSending && !isSendFailed,
-              ),
-              builder: (_, AsyncSnapshot<bool> hot) => Visibility(
-                visible: index == 0
-                    ? (hot.data == true)
-                    : (isSending && !isSendFailed),
-                child: CupertinoActivityIndicator(),
-              ),
-            ),
+          _buildDestroyAfterReadingView(),
+          if (delaySendingStatus) _delayedStatusView(),
           if (!delaySendingStatus)
             Visibility(
               visible: isSending && !isSendFailed,
@@ -185,9 +189,12 @@ class ChatSingleLayout extends StatelessWidget {
             isReceived: isReceivedMsg,
             stream: sendStatusStream,
             isSendFailed: isSendFailed,
+            onFailedResend: failedResend,
           ),
-          if (isSingleChat && !isSendFailed && !isSending)
+          if (isSingleChat && !isSendFailed && !isSending && enabledReadStatus)
             _buildReadStatusView(),
+          if (!isSingleChat && !isSendFailed && !isSending && enabledReadStatus)
+            _buildGroupReadStatusView(),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -275,6 +282,7 @@ class ChatSingleLayout extends StatelessWidget {
         size: avatarSize,
       );
 
+  /// 单聊
   Widget _buildReadStatusView() {
     bool read = !isUnread!;
     return Visibility(
@@ -288,6 +296,25 @@ class ChatSingleLayout extends StatelessWidget {
               UILocalizations.unread,
               style: unread,
             ),
+    );
+  }
+
+  /// 群聊
+  Widget _buildGroupReadStatusView() {
+    int unreadCount = needReadCount - haveReadCount;
+    bool isAllRead = unreadCount <= 0;
+    return Visibility(
+      visible: !isReceivedMsg,
+      child: GestureDetector(
+        onTap: viewMessageReadStatus,
+        behavior: HitTestBehavior.translucent,
+        child: Text(
+          isAllRead
+              ? UILocalizations.allRead
+              : sprintf(UILocalizations.groupUnread, [unreadCount]),
+          style: haveRead,
+        ),
+      ),
     );
   }
 
@@ -315,4 +342,28 @@ class ChatSingleLayout extends StatelessWidget {
     fontSize: 12.sp,
     color: Color(0xFF999999),
   );
+
+  Widget _delayedStatusView() => FutureBuilder(
+        future: Future.delayed(
+          Duration(seconds: (isSending && !isSendFailed) ? 1 : 0),
+          () => isSending && !isSendFailed,
+        ),
+        builder: (_, AsyncSnapshot<bool> hot) => Visibility(
+          visible:
+              index == 0 ? (hot.data == true) : (isSending && !isSendFailed),
+          child: CupertinoActivityIndicator(),
+        ),
+      );
+
+  /// 阅后即焚
+  Widget _buildDestroyAfterReadingView() {
+    bool haveRead = !isUnread!;
+    return Visibility(
+      visible: haveRead && readingDuration > 0,
+      child: TimingView(
+        sec: readingDuration,
+        onFinished: onStartDestroy,
+      ),
+    );
+  }
 }
