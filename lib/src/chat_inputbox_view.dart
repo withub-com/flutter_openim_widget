@@ -149,10 +149,10 @@ class _ChatInputBoxViewState extends State<ChatInputBoxView>
           Container(
             padding: EdgeInsets.symmetric(vertical: 12.h),
             decoration: BoxDecoration(
-              color: Color(0xFFE8F2FF),
+              color: Color(0xFFF2F2F2),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFF000000).withOpacity(0.12),
+                  color: Color(0xFFD2D2D2).withOpacity(0.12),
                   offset: Offset(0, -1),
                   blurRadius: 4,
                   spreadRadius: 0,

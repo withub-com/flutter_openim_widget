@@ -663,13 +663,13 @@ class _ChatItemViewState extends State<ChatItemView> {
           textStyle: menuTextStyle,
           onTap: widget.onTapDelMenu,
         ),
-        MenuInfo(
-          icon: ImageUtil.menuForward(),
-          text: UILocalizations.forward,
-          enabled: _showForwardMenu,
-          textStyle: menuTextStyle,
-          onTap: widget.onTapForwardMenu,
-        ),
+        // MenuInfo(
+        //   icon: ImageUtil.menuForward(),
+        //   text: UILocalizations.forward,
+        //   enabled: _showForwardMenu,
+        //   textStyle: menuTextStyle,
+        //   onTap: widget.onTapForwardMenu,
+        // ),
         MenuInfo(
           icon: ImageUtil.menuReply(),
           text: UILocalizations.reply,
@@ -690,20 +690,21 @@ class _ChatItemViewState extends State<ChatItemView> {
           textStyle: menuTextStyle,
           onTap: widget.onTapMultiMenu,
         ),
-        MenuInfo(
-          icon: ImageUtil.menuTranslation(),
-          text: UILocalizations.translation,
-          enabled: _showTranslationMenu,
-          textStyle: menuTextStyle,
-          onTap: widget.onTapTranslationMenu,
-        ),
-        MenuInfo(
-          icon: ImageUtil.menuAddEmoji(),
-          text: UILocalizations.add,
-          enabled: _showEmojiAddMenu,
-          textStyle: menuTextStyle,
-          onTap: widget.onTapAddEmojiMenu,
-        ),
+        //隐藏翻译
+        // MenuInfo(
+        //   icon: ImageUtil.menuTranslation(),
+        //   text: UILocalizations.translation,
+        //   enabled: _showTranslationMenu,
+        //   textStyle: menuTextStyle,
+        //   onTap: widget.onTapTranslationMenu,
+        // ),
+        // MenuInfo(
+        //   icon: ImageUtil.menuAddEmoji(),
+        //   text: UILocalizations.add,
+        //   enabled: _showEmojiAddMenu,
+        //   textStyle: menuTextStyle,
+        //   onTap: widget.onTapAddEmojiMenu,
+        // ),
       ];
 
   static var menuTextStyle = TextStyle(
