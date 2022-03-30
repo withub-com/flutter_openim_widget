@@ -52,6 +52,7 @@ dependencies:
 #  flutter_openim_sdk:
 #    path: ../flutter_openim_sdk
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
