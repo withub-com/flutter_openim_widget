@@ -33,6 +33,7 @@ class ImageUtil {
     );
   }
 
+  //加载本地webp图片
   static Widget assetImage(
     String res, {
     double? width,
