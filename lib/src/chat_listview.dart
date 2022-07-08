@@ -90,7 +90,7 @@ class _ChatListViewState extends State<CustomChatListView> {
         alignment: Alignment.center,
         height: 60.h,
         child: CupertinoActivityIndicator(
-          color: Colors.blueAccent,
+          // color: Colors.blueAccent,
         ),
       );
 
