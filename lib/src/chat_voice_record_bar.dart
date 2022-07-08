@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_openim_widget/flutter_openim_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -24,7 +25,23 @@ class _ChatVoiceRecordBarState extends State<ChatVoiceRecordBar> {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
+      onTapDown: (details) {
+        setState(() {
+          _pressing = true;
+        });
+      },
+      onTapUp: (details) {
+        setState(() {
+          _pressing = false;
+        });
+      },
+      onTapCancel: () {
+        setState(() {
+          _pressing = false;
+        });
+      },
       onLongPressStart: (details) {
+        HapticFeedback.heavyImpact();
         widget.onLongPressStart(details);
         setState(() {
           _pressing = true;
@@ -45,7 +62,7 @@ class _ChatVoiceRecordBarState extends State<ChatVoiceRecordBar> {
       },
       child: Container(
         // constraints: BoxConstraints(minHeight: 40.h),
-        height: 40.h,
+        height: kVoiceRecordBarHeight,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: Color(0xFF1D6BED).withOpacity(_pressing ? 0.3 : 1),

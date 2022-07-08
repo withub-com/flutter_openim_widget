@@ -12,6 +12,8 @@ List<String> get indexAvatarList => [
       'ic_avatar_06',
     ];
 
+typedef CustomAvatarBuilder = Widget? Function();
+
 class ChatAvatarView extends StatelessWidget {
   const ChatAvatarView({
     Key? key,
@@ -19,6 +21,7 @@ class ChatAvatarView extends StatelessWidget {
     this.size,
     this.onTap,
     this.url,
+    this.builder,
     this.onLongPress,
     this.isCircle = false,
     this.borderRadius,
@@ -28,28 +31,45 @@ class ChatAvatarView extends StatelessWidget {
     this.isNineGrid = false,
     this.nineGridUrls = const [],
     this.isUserGroup = false,
+    this.color,
   }) : super(key: key);
   final bool visible;
   final double? size;
   final Function()? onTap;
   final Function()? onLongPress;
   final String? url;
+  final CustomAvatarBuilder? builder;
   final bool isCircle;
   final BorderRadius? borderRadius;
   final String? text;
   final TextStyle? textStyle;
+  final Color? color;
   final bool lowMemory;
   final List<String> nineGridUrls;
+
+  /// 九宫格
   final bool isNineGrid;
+
+  /// 群头像
   final bool isUserGroup;
 
   double get _size => size ?? 42.h;
 
-  bool _isIndexAvatar() => null != url && indexAvatarList.contains(url);
+  TextStyle get _style =>
+      textStyle ?? TextStyle(fontSize: 14.sp, color: Colors.white);
+
+  Color get _defaultAvatarBgColor => color ?? const Color(0xFF5496EB);
+
+  bool _isIndexAvatar() => indexAvatarList.contains(url);
 
   @override
   Widget build(BuildContext context) {
-    var child = isNineGrid ? _nineGridAvatar() : _normalAvatar();
+    var child = InkWell(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child:
+          builder?.call() ?? (isNineGrid ? _nineGridAvatar() : _normalAvatar()),
+    );
     return Visibility(
       visible: visible,
       child: isCircle
@@ -61,90 +81,55 @@ class ChatAvatarView extends StatelessWidget {
     );
   }
 
-  Widget _normalAvatar() => InkWell(
-        onTap: onTap,
-        onLongPress: onLongPress,
-        child: _avatarView(
-          size: _size,
-          lowMemory: lowMemory,
-          url: url,
-          text: text,
-        ),
+  Widget _normalAvatar() => _avatarView();
+
+  Widget _avatarView() => null == url || url!.isEmpty
+      ? _defaultAvatar()
+      : (_isIndexAvatar() ? _indexAvatar() : _networkImage());
+
+  Widget _indexAvatar() => Container(
+        width: _size,
+        height: _size,
+        child: ImageUtil.assetImage(url!, width: size, height: size),
       );
 
-  Widget _avatarView(
-          {required double size,
-          String? url,
-          String? text,
-          required bool lowMemory}) =>
-      null == url || url.isEmpty
-          ? _defaultAvatar(size: size, text: text)
-          : (_isIndexAvatar()
-              ? _indexAvatar(size: size, url: url)
-              : _networkImage(
-                  url: url, lowMemory: lowMemory, width: size, height: size));
-
-  Widget _indexAvatar({required double size, required String url}) => Container(
-        width: size,
-        height: size,
-        child: ImageUtil.assetImage(url, width: size, height: size),
-      );
-
-  Widget _defaultAvatar({required double size, String? text}) => Container(
-        color: Color(0xFF5496EB),
-        child: null == text
-            ? /*Icon(
-                Icons.person,
+  Widget _defaultAvatar() => Container(
+        color: _defaultAvatarBgColor,
+        child: isUserGroup
+            ? FaIcon(
+                FontAwesomeIcons.userGroup,
                 color: Colors.white,
-                size: size - (size / 4),
-              )*/
-            FaIcon(
-                isUserGroup
-                    ? FontAwesomeIcons.userGroup
-                    : FontAwesomeIcons.solidUser,
-                color: Colors.white,
-                size: size - (size / 2),
+                size: _size - (_size / 2),
               )
-            : Text(
-                text,
-                style: textStyle ??
-                    TextStyle(fontSize: 10.sp, color: Colors.white),
-              ),
-        width: size,
-        height: size,
+            : null == text
+                ? FaIcon(
+                    FontAwesomeIcons.solidUser,
+                    color: Colors.white,
+                    size: _size - (_size / 2),
+                  )
+                : Text(text!, style: _style),
+        width: _size,
+        height: _size,
         alignment: Alignment.center,
-        // color: Colors.grey[400],
       );
 
-  Widget _networkImage({
-    required bool lowMemory,
-    required String url,
-    required double width,
-    required double height,
-    int? cacheWidth,
-    int? cacheHeight,
-  }) =>
-      lowMemory
-          ? ImageUtil.lowMemoryNetworkImage(
-              url: url,
-              width: width,
-              height: height,
-              fit: BoxFit.cover,
-              loadProgress: false,
-              cacheWidth: cacheWidth ?? (1.sw * .3).toInt(),
-              cacheHeight: cacheHeight,
-              // errorWidget: _defaultAvatar(size: _size),
-            )
-          : ImageUtil.networkImage(
-              url: url,
-              width: width,
-              height: height,
-              fit: BoxFit.cover,
-              loadProgress: false,
-              cacheWidth: cacheWidth ?? (1.sw * .3).toInt(),
-              cacheHeight: cacheHeight,
-              // errorWidget: _defaultAvatar(size: _size),
-            );
+  Widget _networkImage() => lowMemory
+      ? ImageUtil.lowMemoryNetworkImage(
+          url: url!,
+          width: _size,
+          height: _size,
+          fit: BoxFit.cover,
+          loadProgress: false,
+          cacheWidth: (1.sw * .3).toInt(),
+        )
+      : ImageUtil.networkImage(
+          url: url!,
+          width: _size,
+          height: _size,
+          fit: BoxFit.cover,
+          loadProgress: false,
+          cacheWidth: (1.sw * .3).toInt(),
+        );
 
   Widget _nineGridAvatar() => Container(
         width: _size,
@@ -261,8 +246,7 @@ class ChatAvatarView extends StatelessWidget {
     );
   }
 
-  Widget _nineGridImage(String? url, double size) =>
-      _avatarView(lowMemory: false, size: size, url: url);
+  Widget _nineGridImage(String? url, double size) => _avatarView();
 
   Widget _nineGridLine({
     double? width,

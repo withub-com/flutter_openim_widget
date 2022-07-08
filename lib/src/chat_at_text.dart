@@ -114,7 +114,7 @@ class ChatAtText extends StatelessWidget {
     }
 
     // match  text
-    text.splitMapJoin(
+    stripHtmlIfNeeded(text).splitMapJoin(
       RegExp(pattern),
       onMatch: (Match match) {
         var matchText = match[0]!;
@@ -138,8 +138,8 @@ class ChatAtText extends StatelessWidget {
           if (mapping.type == PatternType.EMOJI) {
             inlineSpan = ImageSpan(
               ImageUtil.emojiImage(matchText),
-              imageWidth: 16.h,
-              imageHeight: 16.h,
+              imageWidth: style.fontSize!,
+              imageHeight: style.fontSize!,
             );
           } else {
             inlineSpan = TextSpan(
@@ -179,6 +179,10 @@ class ChatAtText extends StatelessWidget {
       default:
         return text;
     }
+  }
+
+  static String stripHtmlIfNeeded(String text) {
+    return text.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ');
   }
 }
 

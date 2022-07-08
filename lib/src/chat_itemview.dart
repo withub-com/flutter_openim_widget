@@ -1,10 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_openim_widget/flutter_openim_widget.dart';
-import 'package:flutter_openim_widget/src/chat_custom_emoji_view.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:focus_detector/focus_detector.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MsgStreamEv<T> {
@@ -25,6 +25,19 @@ typedef ItemVisibilityChange = void Function(
   int index,
   Message message,
   bool visible,
+);
+
+/// MessageType.custom
+typedef CustomMessageBuilder = Widget? Function(
+  BuildContext context,
+  bool isReceivedMsg,
+  int index,
+  Message message,
+  Map<String, String> allAtMap,
+  double textScaleFactor,
+  List<MatchPattern> patterns,
+  Subject<MsgStreamEv<int>> msgSendProgressSubject,
+  Subject<int> clickSubject,
 );
 
 ///  chat item
@@ -207,20 +220,44 @@ class ChatItemView extends StatefulWidget {
   /// 显示消息已读
   final bool enabledReadStatus;
 
+  /// 是否开启阅后即焚
+  final bool isPrivateChat;
+
   /// 阅后即焚回调
   final Function()? onDestroyMessage;
 
-  /// 阅读时长
+  /// 阅读时长s
   final int readingDuration;
-
-  /// 该条群消息需要阅读的人数
-  final int needReadCount;
 
   /// 预览群消息已读状态
   final Function()? onViewMessageReadStatus;
 
   /// 失败重发
   final Function()? onFailedResend;
+
+  /// MessageType.custom
+  final CustomMessageBuilder? customMessageBuilder;
+
+  /// 自定义头像
+  final CustomAvatarBuilder? customLeftAvatarBuilder;
+  final CustomAvatarBuilder? customRightAvatarBuilder;
+  final Color? highlightColor;
+
+  /// 当前播放的语音消息
+  final bool isPlayingSound;
+
+  final Function(bool show)? onPopMenuShowChanged;
+
+  final String? leftName;
+  final String? leftAvatarUrl;
+  final String? rightName;
+  final String? rightAvatarUrl;
+
+  /// 将公告消息做普通消息显示
+  final bool showNoticeMessage;
+
+  /// 显示长按菜单
+  final bool showLongPressMenu;
 
   const ChatItemView({
     Key? key,
@@ -275,11 +312,23 @@ class ChatItemView extends StatefulWidget {
     this.patterns = const [],
     this.delaySendingStatus = false,
     this.enabledReadStatus = true,
-    this.readingDuration = 0,
+    this.readingDuration = 30,
+    this.isPrivateChat = false,
     this.onDestroyMessage,
-    this.needReadCount = 1,
     this.onViewMessageReadStatus,
     this.onFailedResend,
+    this.customMessageBuilder,
+    this.customLeftAvatarBuilder,
+    this.customRightAvatarBuilder,
+    this.highlightColor,
+    this.isPlayingSound = false,
+    this.onPopMenuShowChanged,
+    this.leftName,
+    this.rightName,
+    this.leftAvatarUrl,
+    this.rightAvatarUrl,
+    this.showNoticeMessage = false,
+    this.showLongPressMenu = true,
   }) : super(key: key);
 
   @override
@@ -292,6 +341,7 @@ class _ChatItemViewState extends State<ChatItemView> {
   bool get _isFromMsg => widget.message.sendID != OpenIM.iMManager.uid;
 
   bool get _checked => widget.multiList.contains(widget.message);
+  late StreamSubscription<bool> _keyboardSubs;
 
   /// 提示信息样式
   var _isHintMsg = false;
@@ -304,7 +354,27 @@ class _ChatItemViewState extends State<ChatItemView> {
   @override
   void dispose() {
     _popupCtrl.dispose();
+    _keyboardSubs.cancel();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    var keyboardVisibilityCtrl = KeyboardVisibilityController();
+    // Query
+    print(
+        'Keyboard visibility direct query: ${keyboardVisibilityCtrl.isVisible}');
+
+    // Subscribe
+    _keyboardSubs = keyboardVisibilityCtrl.onChange.listen((bool visible) {
+      print('Keyboard visibility update. Is visible: $visible');
+      _popupCtrl.hideMenu();
+    });
+
+    _popupCtrl.addListener(() {
+      widget.onPopMenuShowChanged?.call(_popupCtrl.menuIsShowing);
+    });
+    super.initState();
   }
 
   @override
@@ -333,6 +403,7 @@ class _ChatItemViewState extends State<ChatItemView> {
             ),
         margin: widget.margin,
         child: child,
+        color: widget.highlightColor,
       ),
       onVisibilityLost: () {
         if (widget.visibilityChange != null) {
@@ -360,6 +431,10 @@ class _ChatItemViewState extends State<ChatItemView> {
   Widget? _buildItemView() {
     Widget? child;
     try {
+      // 公告消息
+      if (widget.showNoticeMessage && null != _noticeView) {
+        return _noticeView;
+      }
       switch (widget.message.contentType) {
         case MessageType.text:
           {
@@ -422,6 +497,7 @@ class _ChatItemViewState extends State<ChatItemView> {
                 soundPath: sound?.soundPath,
                 soundUrl: sound?.sourceUrl,
                 duration: sound?.duration,
+                isPlaying: widget.isPlayingSound,
               ),
             );
           }
@@ -527,6 +603,29 @@ class _ChatItemViewState extends State<ChatItemView> {
             );
           }
           break;
+        case MessageType.custom:
+          {
+            child = _buildCommonItemView(
+              isBubbleBg: widget.isBubbleMsg,
+              child: widget.customMessageBuilder?.call(
+                    context,
+                    _isFromMsg,
+                    widget.index,
+                    widget.message,
+                    widget.allAtMap,
+                    widget.textScaleFactor,
+                    widget.patterns,
+                    widget.msgSendProgressSubject,
+                    widget.clickSubject,
+                  ) ??
+                  ChatAtText(
+                    text: UILocalizations.unsupportedMessage,
+                    textStyle: widget.textStyle,
+                    textScaleFactor: widget.textScaleFactor,
+                  ),
+            );
+          }
+          break;
         default:
           {
             _isHintMsg = true;
@@ -538,7 +637,7 @@ class _ChatItemViewState extends State<ChatItemView> {
                 var content = json.decode(widget.message.content!);
                 text = content['defaultTips'];
               } catch (e) {
-                print('------------->e:$e');
+                print('--------message content parse error----->e:$e');
                 text = json.encode(widget.message);
               }
             }
@@ -559,7 +658,7 @@ class _ChatItemViewState extends State<ChatItemView> {
           break;
       }
     } catch (e) {
-      print('------------->e:$e');
+      print('--------message parse error----->e:$e');
       child = _buildCommonItemView(
         child: ChatAtText(
           text: UILocalizations.unsupportedMessage,
@@ -581,15 +680,16 @@ class _ChatItemViewState extends State<ChatItemView> {
         msgId: widget.message.clientMsgID!,
         index: widget.index,
         menuBuilder: _menuBuilder,
+        haveUsableMenu: _haveUsableMenu,
         clickSink: widget.clickSubject.sink,
         sendStatusStream: widget.msgSendStatusSubject.stream,
         popupCtrl: _popupCtrl,
         isReceivedMsg: _isFromMsg,
         isSingleChat: widget.isSingleChat,
         avatarSize: widget.avatarSize ?? 42.h,
-        rightAvatar: OpenIM.iMManager.uInfo.faceURL!,
-        leftAvatar: widget.message.senderFaceUrl!,
-        leftName: widget.message.senderNickname!,
+        rightAvatar: widget.rightAvatarUrl ?? OpenIM.iMManager.uInfo.faceURL,
+        leftAvatar: widget.leftAvatarUrl ?? widget.message.senderFaceUrl,
+        leftName: widget.leftName ?? widget.message.senderNickname ?? '',
         isUnread: !widget.message.isRead!,
         leftBubbleColor: widget.leftBubbleColor,
         rightBubbleColor: widget.rightBubbleColor,
@@ -608,12 +708,16 @@ class _ChatItemViewState extends State<ChatItemView> {
         onRadioChanged: widget.onMultiSelChanged,
         delaySendingStatus: widget.delaySendingStatus,
         enabledReadStatus: widget.enabledReadStatus,
+        isPrivateChat: widget.isPrivateChat,
         onStartDestroy: widget.onDestroyMessage,
         readingDuration: widget.readingDuration,
-        needReadCount: widget.needReadCount,
+        needReadCount: _needReadCount,
         haveReadCount: _haveReadCount,
         viewMessageReadStatus: widget.onViewMessageReadStatus,
         failedResend: widget.onFailedResend,
+        customLeftAvatarBuilder: widget.customLeftAvatarBuilder,
+        customRightAvatarBuilder: widget.customRightAvatarBuilder,
+        showLongPressMenu: widget.showLongPressMenu,
       );
 
   Widget _menuBuilder() => ChatLongPressMenu(
@@ -712,12 +816,63 @@ class _ChatItemViewState extends State<ChatItemView> {
     color: Color(0xFFFFFFFF),
   );
 
-  Widget? get _quoteView => widget.message.contentType == MessageType.quote
-      ? ChatQuoteView(
-          message: widget.message,
+  // Widget? get _quoteView => widget.message.contentType == MessageType.quote
+  //     ? ChatQuoteView(
+  //         message: widget.message,
+  //         onTap: widget.onTapQuoteMsg,
+  //       )
+  //     : null;
+
+  Widget? get _quoteView {
+    if (widget.message.contentType == MessageType.quote) {
+      return ChatQuoteView(
+        message: widget.message.quoteElem!.quoteMessage!,
+        onTap: widget.onTapQuoteMsg,
+      );
+    } else if (widget.message.contentType == MessageType.at_text) {
+      var message = widget.message.atElem!.quoteMessage;
+      if (message != null) {
+        return ChatQuoteView(
+          message: message,
           onTap: widget.onTapQuoteMsg,
-        )
-      : null;
+        );
+      }
+    }
+    return null;
+  }
+
+  /// 公告消息
+  Widget? get _noticeView {
+    // 公告消息
+    if (widget.message.contentType! == MessageType.groupInfoSetNotification) {
+      final elem = widget.message.notificationElem!;
+      final map = json.decode(elem.detail!);
+      final notification = GroupNotification.fromJson(map);
+      if (notification.group?.notification != null &&
+          notification.group!.notification!.trim().isNotEmpty) {
+        return _buildCommonItemView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ChatAtText(
+                text: UILocalizations.groupNotice,
+                textStyle: widget.textStyle,
+                textScaleFactor: widget.textScaleFactor,
+                patterns: widget.patterns,
+              ),
+              ChatAtText(
+                text: notification.group!.notification!,
+                textStyle: widget.textStyle,
+                textScaleFactor: widget.textScaleFactor,
+                patterns: widget.patterns,
+              )
+            ],
+          ),
+        );
+      }
+    }
+    return null;
+  }
 
   bool get _showCopyMenu =>
       widget.enabledCopyMenu ?? widget.message.contentType == MessageType.text;
@@ -757,4 +912,17 @@ class _ChatItemViewState extends State<ChatItemView> {
       widget.message.attachedInfoElem?.groupHasReadInfo?.hasReadUserIDList
           ?.length ??
       0;
+
+  int get _needReadCount =>
+      widget.message.attachedInfoElem?.groupHasReadInfo?.groupMemberCount ?? 0;
+
+  bool get _haveUsableMenu =>
+      _showCopyMenu ||
+      _showDelMenu ||
+      _showForwardMenu ||
+      _showReplyMenu ||
+      _showRevokeMenu ||
+      _showMultiChoiceMenu ||
+      _showTranslationMenu ||
+      _showEmojiAddMenu;
 }

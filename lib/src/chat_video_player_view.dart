@@ -1,23 +1,34 @@
 import 'dart:io';
 
 import 'package:chewie/chewie.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_openim_widget/flutter_openim_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 
 class ChatVideoPlayerView extends StatefulWidget {
   final String? path;
   final String? url;
   final String? coverUrl;
-  final String? tag;
-  final Function(String url)? onDownload;
+  final String? heroTag;
+  final Dio? dio;
+  final Function(String url, String path)? onStartDownload;
+  final Function(String url, String path)? onDownloadFinished;
+  final bool enabledHero;
 
-  const ChatVideoPlayerView(
-      {Key? key, this.path, this.url, this.coverUrl, this.tag, this.onDownload})
-      : super(key: key);
+  const ChatVideoPlayerView({
+    Key? key,
+    this.path,
+    this.url,
+    this.coverUrl,
+    this.heroTag,
+    this.dio,
+    this.onDownloadFinished,
+    this.onStartDownload,
+    this.enabledHero = false,
+  }) : super(key: key);
 
   @override
   _ChatVideoPlayerViewState createState() => _ChatVideoPlayerViewState();
@@ -26,6 +37,19 @@ class ChatVideoPlayerView extends StatefulWidget {
 class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
+
+  _startDownload() async {
+    var dir = await getTemporaryDirectory();
+    var name = widget.url!.substring(widget.url!.lastIndexOf('/'));
+    String savePath = dir.path + name;
+    widget.onStartDownload?.call(widget.url!, savePath);
+    await widget.dio?.download(
+      widget.url!,
+      savePath,
+      options: Options(receiveTimeout: 120 * 1000),
+    );
+    widget.onDownloadFinished?.call(widget.url!, savePath);
+  }
 
   @override
   void initState() {
@@ -53,11 +77,11 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
     if (null != file) {
       _videoPlayerController = VideoPlayerController.file(file);
     } else {
-      file = await DefaultCacheManager().getSingleFile(_url!).timeout(
-            Duration(seconds: 60),
-          );
-      _videoPlayerController = VideoPlayerController.file(file);
-      // _videoPlayerController = VideoPlayerController.network(_url!);
+      // file = await DefaultCacheManager().getSingleFile(_url!).timeout(
+      //       Duration(seconds: 60),
+      //     );
+      // _videoPlayerController = VideoPlayerController.file(file);
+      _videoPlayerController = VideoPlayerController.network(_url!);
     }
     await Future.wait([
       _videoPlayerController.initialize(),
@@ -71,6 +95,12 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
       looping: false,
+      showControlsOnInitialize: false,
+      optionsTranslation: OptionsTranslation(
+        playbackSpeedButtonText: UILocalizations.playSpeed,
+        cancelButtonText: UILocalizations.cancel,
+      ),
+      // showOptions: false,
       // Try playing around with some of these other options:
       // showControls: false,
       // materialProgressColors: ChewieProgressColors(
@@ -99,7 +129,9 @@ class _ChatVideoPlayerViewState extends State<ChatVideoPlayerView> {
     ]);
     return Material(
       color: Color(0xFF000000),
-      child: widget.tag == null ? child : Hero(tag: widget.tag!, child: child),
+      child: (widget.enabledHero && widget.heroTag != null)
+          ? Hero(tag: widget.heroTag!, child: child)
+          : child,
     );
   }
 

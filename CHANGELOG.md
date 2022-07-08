@@ -1,3 +1,36 @@
+## 2.1.0
+
+* Fix bug<br>
+
+## 2.0.9+1
+
+* Fix bug<br>
+* Adapt to flutter 3.0<br>
+
+## 2.0.9
+
+* Fix burning after reading bug<br>
+* Fix the bug of audio playback interruption<br>
+* Fix other bug<br>
+* Fix menu occlude bug<br>
+
+## 2.0.8
+
+* Update im sdk to 2.0.8<br>
+
+## 0.0.11
+
+* Update im sdk to v2.0.0+6 <br>
+
+## 0.0.10
+
+* Update im sdk to v2.0.0+5 <br>
+
+## 0.0.9
+
+* Update im sdk to v2.0.0+4 <br>
+* Replace better_player package to video_player
+
 ## 0.0.8
 
 * Update im sdk to v2.0.0+3
