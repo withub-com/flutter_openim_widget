@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/widgets.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -88,8 +90,16 @@ class _FocusDetectorState extends State<FocusDetector>
   Widget build(BuildContext context) => VisibilityDetector(
         key: _visibilityDetectorKey,
         onVisibilityChanged: (visibilityInfo) {
-          final visibleFraction = visibilityInfo.visibleFraction;
-          _notifyVisibilityStatusChange(visibleFraction);
+          try {
+            // 当widget高度超过一屏时visibilityInfo.visibleFraction的值达不到1
+            final visibleBoundsBottom = visibilityInfo.visibleBounds.bottom;
+            final height = visibilityInfo.size.height;
+            final fraction = visibleBoundsBottom / height;
+            _notifyVisibilityStatusChange(fraction);
+          } catch (_) {
+            final visibleFraction = visibilityInfo.visibleFraction;
+            _notifyVisibilityStatusChange(visibleFraction);
+          }
         },
         child: widget.child,
       );

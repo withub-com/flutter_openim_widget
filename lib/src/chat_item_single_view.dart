@@ -47,6 +47,7 @@ class ChatSingleLayout extends StatelessWidget {
   final CustomAvatarBuilder? customRightAvatarBuilder;
   final bool haveUsableMenu;
   final bool showLongPressMenu;
+  final bool isVoiceMessage;
 
   const ChatSingleLayout({
     Key? key,
@@ -92,6 +93,7 @@ class ChatSingleLayout extends StatelessWidget {
     this.customRightAvatarBuilder,
     this.haveUsableMenu = true,
     this.showLongPressMenu = true,
+    this.isVoiceMessage = false,
   }) : super(key: key);
 
   @override
@@ -115,11 +117,20 @@ class ChatSingleLayout extends StatelessWidget {
                 children: [
                   if (timeView != null) timeView!,
                   _buildContentView(),
-                  if (quoteView != null)
-                    Row(
-                      mainAxisAlignment: _layoutAlignment(),
-                      children: [_buildQuoteMsgView()],
+                  Container(
+                    margin: EdgeInsets.only(
+                      left: isReceivedMsg ? avatarSize + 10.w : 0,
+                      right: isReceivedMsg ? 0 : avatarSize + 10.w,
                     ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: _layoutAlignment(),
+                      children: [
+                        if (quoteView != null) _buildQuoteMsgView(),
+                        ..._getReadStatusView(),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -168,19 +179,25 @@ class ChatSingleLayout extends StatelessWidget {
                       ),
                     ),
                   ),
-                  !showLongPressMenu
-                      ? _buildChildView(BubbleType.receiver)
-                      : CopyCustomPopupMenu(
-                          controller: popupCtrl,
-                          barrierColor: Colors.transparent,
-                          arrowColor: Color(0xFF666666),
-                          verticalMargin: 0,
-                          // horizontalMargin: 0,
-                          child: _buildChildView(BubbleType.receiver),
-                          menuBuilder: menuBuilder,
-                          pressType: PressType.longPress,
-                          showArrow: haveUsableMenu,
-                        ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      !showLongPressMenu
+                          ? _buildChildView(BubbleType.receiver)
+                          : CopyCustomPopupMenu(
+                              controller: popupCtrl,
+                              barrierColor: Colors.transparent,
+                              arrowColor: Color(0xFF666666),
+                              verticalMargin: 0,
+                              // horizontalMargin: 0,
+                              child: _buildChildView(BubbleType.receiver),
+                              menuBuilder: menuBuilder,
+                              pressType: PressType.longPress,
+                              showArrow: haveUsableMenu,
+                            ),
+                      /*if (enabledReadStatus) */ _buildVoiceReadStatusView(),
+                    ],
+                  ),
                 ],
               ),
               if (isSingleChat) _buildDestroyAfterReadingView(),
@@ -201,6 +218,7 @@ class ChatSingleLayout extends StatelessWidget {
         )
       : _noBubbleBgView();
 
+  // avatarSize + 10
   Widget _isToWidget() => Row(
         mainAxisAlignment: _layoutAlignment(),
         children: [
@@ -218,10 +236,7 @@ class ChatSingleLayout extends StatelessWidget {
             isSendFailed: isSendFailed,
             onFailedResend: failedResend,
           ),
-          if (isSingleChat && !isSendFailed && !isSending && enabledReadStatus)
-            _buildReadStatusView(),
-          if (!isSingleChat && !isSendFailed && !isSending && enabledReadStatus)
-            _buildGroupReadStatusView(),
+          // ..._getReadStatusView(),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -305,6 +320,21 @@ class ChatSingleLayout extends StatelessWidget {
         builder: builder,
       );
 
+  /// 语音未读状态
+  Widget _buildVoiceReadStatusView() {
+    return Visibility(
+      visible: isVoiceMessage && isUnread!,
+      child: Container(
+        width: 6.w,
+        height: 6.w,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF44038),
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+
   /// 单聊
   Widget _buildReadStatusView() {
     bool read = !isUnread!;
@@ -345,11 +375,6 @@ class ChatSingleLayout extends StatelessWidget {
   Widget _buildQuoteMsgView() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
-      margin: EdgeInsets.only(
-        left: isReceivedMsg ? avatarSize + 10.w : 0,
-        right: isReceivedMsg ? 0 : avatarSize + 10.w,
-        // top: 2.h,
-      ),
       decoration: BoxDecoration(
         color: Color(0xFFF0F0F0),
         borderRadius: BorderRadius.circular(2),
@@ -393,4 +418,18 @@ class ChatSingleLayout extends StatelessWidget {
       ),
     );
   }
+
+  /// 显示单聊已读状态
+  bool get _showSingleChatReadStatus =>
+      isSingleChat && !isSendFailed && !isSending && enabledReadStatus;
+
+  /// 显示群聊已读状态
+  bool get _showGroupChatReadStatus =>
+      !isSingleChat && !isSendFailed && !isSending && enabledReadStatus;
+
+  /// 读状态
+  List<Widget> _getReadStatusView() => [
+        if (_showSingleChatReadStatus) _buildReadStatusView(),
+        if (_showGroupChatReadStatus) _buildGroupReadStatusView(),
+      ];
 }

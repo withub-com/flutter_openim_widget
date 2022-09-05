@@ -17,7 +17,15 @@ class ChatToolsView extends StatefulWidget {
   final Function()? onTapCarte;
   final Function()? onStartVoiceInput;
   final Function()? onStopVoiceInput;
-  final bool showVoiceInput;
+  final Widget? albumIcon;
+  final Widget? cameraIcon;
+  final Widget? videoCallIcon;
+  final Widget? locationIcon;
+  final Widget? fileIcon;
+  final Widget? carteIcon;
+  final Widget? voiceInputIcon;
+  final EdgeInsetsGeometry? margin;
+  final double? verticalSpacing;
 
   const ChatToolsView({
     Key? key,
@@ -31,7 +39,15 @@ class ChatToolsView extends StatefulWidget {
     this.onTapCarte,
     this.onStartVoiceInput,
     this.onStopVoiceInput,
-    this.showVoiceInput = true,
+    this.albumIcon,
+    this.cameraIcon,
+    this.videoCallIcon,
+    this.locationIcon,
+    this.fileIcon,
+    this.carteIcon,
+    this.voiceInputIcon,
+    this.margin,
+    this.verticalSpacing,
   }) : super(key: key);
 
   @override
@@ -100,10 +116,21 @@ class _ChatToolsViewState extends State<ChatToolsView>
     );
   }
 
+  Widget get _verticalSpacing => SizedBox(
+        height: widget.verticalSpacing ?? 14.h,
+      );
+
+  EdgeInsetsGeometry get _margin =>
+      widget.margin ??
+      EdgeInsets.symmetric(
+        horizontal: 38.w,
+        vertical: 17.h,
+      );
+
   Widget _buildToolsLayout() => Container(
         alignment: Alignment.center,
         padding: EdgeInsets.symmetric(horizontal: 38.w, vertical: 17.h),
-        child: true ?  Column(
+        child:   Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -208,98 +235,7 @@ class _ChatToolsViewState extends State<ChatToolsView>
             // Spacer(),
 
           ],
-        ) : Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              children: [
-                _toolsOption(ToolsItem(
-                  label: UILocalizations.album,
-                  style: toolsTextStyle,
-                  image: _buildBtn(
-                    icon: ImageUtil.toolsAlbum(),
-                    onTap: widget.onTapAlbum,
-                  ),
-                )),
-                SizedBox(
-                  height: 14.h,
-                ),
-                _toolsOption(ToolsItem(
-                  label: UILocalizations.file,
-                  style: toolsTextStyle,
-                  image: _buildBtn(
-                    icon: ImageUtil.toolsFile(),
-                    onTap: widget.onTapFile,
-                  ),
-                )),
-              ],
-            ),
-            Spacer(),
-            Column(
-              children: [
-                _toolsOption(ToolsItem(
-                  label: UILocalizations.camera,
-                  style: toolsTextStyle,
-                  image: _buildBtn(
-                    icon: ImageUtil.toolsCamera(),
-                    onTap: widget.onTapCamera,
-                  ),
-                )),
-                SizedBox(
-                  height: 14.h,
-                ),
-                _toolsOption(ToolsItem(
-                  label: UILocalizations.carte,
-                  style: toolsTextStyle,
-                  image: _buildBtn(
-                    icon: ImageUtil.toolsCarte(),
-                    onTap: widget.onTapCarte,
-                  ),
-                )),
-              ],
-            ),
-            Spacer(),
-            Column(
-              children: [
-                _toolsOption(ToolsItem(
-                  label: UILocalizations.videoCall,
-                  style: toolsTextStyle,
-                  image: _buildBtn(
-                    icon: ImageUtil.toolsVideoCall(),
-                    onTap: widget.onTapVideoCall,
-                  ),
-                )),
-                SizedBox(
-                  height: 14.h,
-                ),
-                if (widget.showVoiceInput)
-                  _toolsOption(ToolsItem(
-                    label: UILocalizations.voiceInput,
-                    style: toolsTextStyle,
-                    image: _buildBtn(
-                      icon: ImageUtil.toolsVoiceInput(),
-                      onTap: () {
-                        setState(() {
-                          _enabledVoiceInput = true;
-                          _controller.forward();
-                        });
-                      },
-                    ),
-                  )),
-              ],
-            ),
-            Spacer(),
-            _toolsOption(ToolsItem(
-              label: UILocalizations.location,
-              style: toolsTextStyle,
-              image: _buildBtn(
-                icon: ImageUtil.toolsLocation(),
-                onTap: widget.onTapLocation,
-              ),
-            )),
-          ],
-        ),
-      );
+        ) );
 
   Widget _buildVoiceInputLayout() => AnimatedBuilder(
       animation: _controller,
