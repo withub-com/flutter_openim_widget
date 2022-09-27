@@ -129,7 +129,7 @@ class _ChatToolsViewState extends State<ChatToolsView>
 
   Widget _buildToolsLayout() => Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(horizontal: 38.w, vertical: 17.h),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 17.h),
         child:   Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
