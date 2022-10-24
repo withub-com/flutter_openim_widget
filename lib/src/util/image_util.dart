@@ -118,6 +118,18 @@ class ImageUtil {
         height: 48.h,
       );
 
+  static Widget toolsMakingCard() => assetImage(
+    'ic_tools_making_card',
+    width: 48.h,
+    height: 48.h,
+  );
+
+  static Widget toolsMatching() => assetImage(
+    'ic_tools_matching',
+    width: 48.h,
+    height: 48.h,
+  );
+
   static Widget toolsCamera() => assetImage(
         'ic_tools_camera',
         width: 48.h,

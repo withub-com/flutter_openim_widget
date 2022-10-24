@@ -10,6 +10,8 @@ class ChatToolsView extends StatefulWidget {
   final List<ToolsItem>? items;
   final ToolsLayoutParams? layoutParams;
   final Function()? onTapAlbum;
+  final Function()? onTapMakingCard;
+  final Function()? onTapMatching;
   final Function()? onTapCamera;
   final Function()? onTapVideoCall;
   final Function()? onTapLocation;
@@ -26,12 +28,15 @@ class ChatToolsView extends StatefulWidget {
   final Widget? voiceInputIcon;
   final EdgeInsetsGeometry? margin;
   final double? verticalSpacing;
+  final bool showMaking;
 
   const ChatToolsView({
     Key? key,
     this.items,
     this.layoutParams,
     this.onTapAlbum,
+    this.onTapMakingCard,
+    this.onTapMatching,
     this.onTapCamera,
     this.onTapVideoCall,
     this.onTapLocation,
@@ -48,6 +53,7 @@ class ChatToolsView extends StatefulWidget {
     this.voiceInputIcon,
     this.margin,
     this.verticalSpacing,
+    this.showMaking = false,
   }) : super(key: key);
 
   @override
@@ -173,19 +179,38 @@ class _ChatToolsViewState extends State<ChatToolsView>
             SizedBox(
               height: 14.h,
             ),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     _toolsOption(ToolsItem(
-            //       label: UILocalizations.videoCall,
-            //       style: toolsTextStyle,
-            //       image: _buildBtn(
-            //         icon: IconUtil.toolsVideoCall(),
-            //         onTap: widget.onTapVideoCall,
-            //       ),
-            //     )),
-            //   ],
-            // )
+           widget.showMaking ? Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _toolsOption(ToolsItem(
+                  label: '解锁名片',
+                  style: toolsTextStyle,
+                  image: _buildBtn(
+                    icon: ImageUtil.toolsMakingCard(),
+                    onTap: widget.onTapMakingCard,
+                  ),
+                )),
+                _toolsOption(ToolsItem(
+                  label: '重新匹配',
+                  style: toolsTextStyle,
+                  image: _buildBtn(
+                    icon: ImageUtil.toolsMatching(),
+                    onTap: widget.onTapMatching,
+                  ),
+                )),
+                _toolsOption(ToolsItem(
+                  label: '',
+                  style: toolsTextStyle,
+                  image: SizedBox(width: 44,),
+                )),
+
+                _toolsOption(ToolsItem(
+                  label: '',
+                  style: toolsTextStyle,
+                  image: SizedBox(width: 44,),
+                )),
+              ],
+            ) : SizedBox()
             // Column(
             //   children: [
             //
