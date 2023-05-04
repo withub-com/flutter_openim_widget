@@ -27,6 +27,7 @@ class ChatInputBoxView extends StatefulWidget {
     this.inputFormatters,
     this.showEmojiButton = true,
     this.showToolsButton = true,
+    this.showSpeckButton = true,
     this.isGroupMuted = false,
     this.muteEndTime = 0,
     this.background,
@@ -75,6 +76,7 @@ class ChatInputBoxView extends StatefulWidget {
   final Widget? keyboardIcon;
   final Widget? toolsIcon;
   final Widget? emojiIcon;
+  final bool showSpeckButton;
   final bool enabledVoiceButton;
   final bool enabledEmojiButton;
   final bool enabledToolboxButton;
@@ -198,7 +200,13 @@ class _ChatInputBoxViewState extends State<ChatInputBoxView>
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    _leftKeyboardButton ? _keyboardLeftBtn() : _speakBtn(),
+                    !widget.showSpeckButton
+                        ? SizedBox(
+                            width: 20.h,
+                          )
+                        : _leftKeyboardButton
+                            ? _keyboardLeftBtn()
+                            : _speakBtn(),
                     Flexible(
                       child: Stack(
                         children: [
