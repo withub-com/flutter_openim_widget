@@ -129,7 +129,13 @@ class ChatSingleLayout extends StatelessWidget {
                       mainAxisAlignment: _layoutAlignment(),
                       children: [
                         if (quoteView != null) _buildQuoteMsgView(),
-                        // ..._getReadStatusView(),
+                        // Column(
+                        //   crossAxisAlignment: CrossAxisAlignment.end,
+                        //   children: [
+                        //     if (quoteView != null) _buildQuoteMsgView(),
+                        //     ..._getReadStatusView(),
+                        //   ],
+                        // ),
                       ],
                     ),
                   ),
