@@ -99,9 +99,9 @@
     },
     {
       "name": "dio",
-      "rootUri": "file:///C:/Users/Poker/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/dio-4.0.6",
+      "rootUri": "file:///C:/Users/Poker/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/dio-5.1.1",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "2.15"
     },
     {
       "name": "emoji_picker_flutter",
@@ -195,7 +195,7 @@
     },
     {
       "name": "flutter_openim_sdk",
-      "rootUri": "file:///C:/Users/Poker/AppData/Local/Pub/Cache/git/Open-IM-SDK-Flutter-39727feb8ac4905963b277521542e9c9a50c8ccf/",
+      "rootUri": "file:///C:/Users/Poker/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_openim_sdk-2.3.5+2",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -728,7 +728,7 @@
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2023-05-04T07:20:44.491848Z",
+  "generated": "2023-05-05T03:03:05.285051Z",
   "generator": "pub",
   "generatorVersion": "2.19.6"
 }
