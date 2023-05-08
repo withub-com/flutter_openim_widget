@@ -32,7 +32,7 @@ class ChatInputBoxView extends StatefulWidget {
     this.muteEndTime = 0,
     this.background,
     this.iconColor,
-    this.mutedIconColor = const Color(0xFFbdbdbd),
+    this.disabledColor = const Color(0xFFbdbdbd),
     this.isInBlacklist = false,
     this.speakIcon,
     this.emojiIcon,
@@ -41,6 +41,9 @@ class ChatInputBoxView extends StatefulWidget {
     this.buttonColor,
     this.buttonTextStyle,
     this.buttonRadius,
+    this.enabledEmojiButton = true,
+    this.enabledToolboxButton = true,
+    this.enabledVoiceButton = false,
   }) : super(key: key);
   final AtTextCallback? atCallback;
   final Map<String, String> allAtMap;
@@ -65,7 +68,7 @@ class ChatInputBoxView extends StatefulWidget {
   final bool isInBlacklist;
   final Color? background;
   final Color? iconColor;
-  final Color mutedIconColor;
+  final Color? disabledColor;
   final Color? buttonColor;
   final TextStyle? buttonTextStyle;
   final double? buttonRadius;
@@ -73,7 +76,10 @@ class ChatInputBoxView extends StatefulWidget {
   final Widget? keyboardIcon;
   final Widget? toolsIcon;
   final Widget? emojiIcon;
-  final bool  showSpeckButton;
+  final bool showSpeckButton;
+  final bool enabledVoiceButton;
+  final bool enabledEmojiButton;
+  final bool enabledToolboxButton;
 
   @override
   _ChatInputBoxViewState createState() => _ChatInputBoxViewState();
@@ -94,12 +100,12 @@ class _ChatInputBoxViewState extends State<ChatInputBoxView>
       duration: Duration(milliseconds: 200),
       vsync: this,
     )..addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        // controller.reverse();
-      } else if (status == AnimationStatus.dismissed) {
-        // controller.forward();
-      }
-    });
+        if (status == AnimationStatus.completed) {
+          // controller.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          // controller.forward();
+        }
+      });
 
     _animation = Tween(begin: 1.0, end: 0.0).animate(_controller)
       ..addListener(() {
@@ -175,178 +181,184 @@ class _ChatInputBoxViewState extends State<ChatInputBoxView>
       width: widget.showEmojiButton || widget.showToolsButton ? 0 : 10.w);
 
   Widget _buildMsgInputField({required BuildContext context}) => Column(
-    children: [
-      Container(
-        padding: EdgeInsets.symmetric(vertical: 12.h),
-        decoration: BoxDecoration(
-          color: widget.background ?? Color(0xFFF2F2F2),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0xFFD2D2D2).withOpacity(0.12),
-              offset: Offset(0, -1),
-              blurRadius: 4,
-              spreadRadius: 0,
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                !widget.showSpeckButton ?  SizedBox(width: 20.h,): _leftKeyboardButton ? _keyboardLeftBtn() : _speakBtn(),
-                Flexible(
-                  child: Stack(
-                    children: [
-                      Offstage(
-                        child: Column(
-                          children: [
-                            _buildTextFiled(),
-                            if (widget.quoteContent != null &&
-                                "" != widget.quoteContent)
-                              _quoteView(),
-                          ],
-                        ),
-                        offstage: _leftKeyboardButton,
-                      ),
-                      Offstage(
-                        child: widget.voiceRecordBar,
-                        offstage: !_leftKeyboardButton,
-                      ),
-                      // _keyboardInput ? _buildTextFiled() : _buildSpeakBar()
-                    ],
-                  ),
-                ),
-                if (widget.showEmojiButton)
-                  _rightKeyboardButton ? _keyboardRightBtn() : _emojiBtn(),
-                if (widget.showToolsButton) _toolsBtn(),
-                spaceView,
-                Visibility(
-                  visible: !_leftKeyboardButton || !_rightKeyboardButton,
-                  child: Container(
-                    width: 60.0.w * (1.0 - _animation.value),
-                    child: _buildSendButton(),
-                  ),
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 12.h),
+            decoration: BoxDecoration(
+              color: widget.background ?? Color(0xFFE8F2FF),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFF000000).withOpacity(0.12),
+                  offset: Offset(0, -1),
+                  blurRadius: 4,
+                  spreadRadius: 0,
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-      Visibility(
-        visible: _toolsVisible,
-        child: widget.toolbox,
-      ),
-      Visibility(
-        visible: _emojiVisible,
-        child: widget.emojiView,
-      ),
-    ],
-  );
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    !widget.showSpeckButton
+                        ? SizedBox(
+                            width: 20.h,
+                          )
+                        : _leftKeyboardButton
+                            ? _keyboardLeftBtn()
+                            : _speakBtn(),
+                    Flexible(
+                      child: Stack(
+                        children: [
+                          Offstage(
+                            child: Column(
+                              children: [
+                                _buildTextFiled(),
+                                if (widget.quoteContent != null &&
+                                    "" != widget.quoteContent)
+                                  _quoteView(),
+                              ],
+                            ),
+                            offstage: _leftKeyboardButton,
+                          ),
+                          Offstage(
+                            child: widget.voiceRecordBar,
+                            offstage: !_leftKeyboardButton,
+                          ),
+                          // _keyboardInput ? _buildTextFiled() : _buildSpeakBar()
+                        ],
+                      ),
+                    ),
+                    if (widget.showEmojiButton)
+                      _rightKeyboardButton ? _keyboardRightBtn() : _emojiBtn(),
+                    if (widget.showToolsButton) _toolsBtn(),
+                    spaceView,
+                    Visibility(
+                      visible: !_leftKeyboardButton || !_rightKeyboardButton,
+                      child: Container(
+                        width: 60.0.w * (1.0 - _animation.value),
+                        child: _buildSendButton(),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Visibility(
+            visible: _toolsVisible,
+            child: widget.toolbox,
+          ),
+          Visibility(
+            visible: _emojiVisible,
+            child: widget.emojiView,
+          ),
+        ],
+      );
 
   Widget _buildSendButton() => GestureDetector(
-    onTap: () {
-      if (!_emojiVisible) focus();
-      if (null != widget.onSubmitted && null != widget.controller) {
-        widget.onSubmitted!(widget.controller!.text.toString());
-      }
-    },
-    child: Container(
-      height: 33.h,
-      width: 60.w,
-      // padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-      alignment: Alignment.center,
-      margin: EdgeInsets.only(right: 10.w),
-      decoration: BoxDecoration(
-        color: widget.buttonColor ?? const Color(0xFF1B72EC),
-        borderRadius: BorderRadius.circular(widget.buttonRadius ?? 4),
-      ),
-      child: Text(
-        UILocalizations.send,
-        maxLines: 1,
-        style: widget.buttonTextStyle ??
-            TextStyle(
-              fontSize: 14.sp,
-              color: Color(0xFFFFFFFF),
-            ),
-      ),
-    ),
-  );
+        onTap: () {
+          if (!_emojiVisible) focus();
+          if (null != widget.onSubmitted && null != widget.controller) {
+            widget.onSubmitted!(widget.controller!.text.toString());
+          }
+        },
+        child: Container(
+          height: 33.h,
+          width: 60.w,
+          // padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+          alignment: Alignment.center,
+          margin: EdgeInsets.only(right: 10.w),
+          decoration: BoxDecoration(
+            color: widget.buttonColor ?? const Color(0xFF1B72EC),
+            borderRadius: BorderRadius.circular(widget.buttonRadius ?? 4),
+          ),
+          child: Text(
+            UILocalizations.send,
+            maxLines: 1,
+            style: widget.buttonTextStyle ??
+                TextStyle(
+                  fontSize: 14.sp,
+                  color: Color(0xFFFFFFFF),
+                ),
+          ),
+        ),
+      );
 
   Widget _quoteView() => GestureDetector(
-    behavior: HitTestBehavior.translucent,
-    onTap: widget.onClearQuote,
-    child: Container(
-      margin: EdgeInsets.only(top: 4.h),
-      padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
-      decoration: BoxDecoration(
-        color: Color(0xFFFFFFFF),
-        borderRadius: BorderRadius.circular(2),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Text(
-              widget.quoteContent!,
-              style: TextStyle(
-                color: Color(0xFF666666),
-                fontSize: 12.sp,
-              ),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
+        behavior: HitTestBehavior.translucent,
+        onTap: widget.onClearQuote,
+        child: Container(
+          margin: EdgeInsets.only(top: 4.h),
+          padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+          decoration: BoxDecoration(
+            color: Color(0xFFFFFFFF),
+            borderRadius: BorderRadius.circular(2),
           ),
-          ImageUtil.delQuote(),
-        ],
-      ),
-    ),
-  );
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  widget.quoteContent!,
+                  style: TextStyle(
+                    color: Color(0xFF666666),
+                    fontSize: 12.sp,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              ImageUtil.delQuote(),
+            ],
+          ),
+        ),
+      );
 
   Widget _buildTextFiled() => Container(
-    alignment: Alignment.center,
-    constraints: BoxConstraints(minHeight: kVoiceRecordBarHeight),
-    decoration: BoxDecoration(
-      color: Color(0xFFFFFFFF),
-      borderRadius: BorderRadius.circular(4),
-    ),
-    child: Stack(
-      children: [
-        ChatTextField(
-          style: widget.style ?? textStyle,
-          atStyle: widget.atStyle ?? atStyle,
-          atCallback: widget.atCallback,
-          allAtMap: widget.allAtMap,
-          focusNode: widget.focusNode,
-          controller: widget.controller,
-          enabled: !_isMuted,
-          inputFormatters: widget.inputFormatters,
-          // onSubmitted: (value) {
-          //   focus();
-          //   if (null != widget.onSubmitted) widget.onSubmitted!(value);
-          // },
+        alignment: Alignment.center,
+        constraints: BoxConstraints(minHeight: kVoiceRecordBarHeight),
+        decoration: BoxDecoration(
+          color: Color(0xFFFFFFFF),
+          borderRadius: BorderRadius.circular(4),
         ),
-        Visibility(
-          visible: _isMuted,
-          child: Container(
-            alignment: Alignment.center,
-            constraints: BoxConstraints(minHeight: 40.h),
-            child: Text(
-              widget.isInBlacklist
-                  ? UILocalizations.inBlacklist
-                  : (widget.isGroupMuted
-                  ? UILocalizations.groupMuted
-                  : UILocalizations.youMuted),
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: Color(0xFF999999),
+        child: Stack(
+          children: [
+            ChatTextField(
+              style: widget.style ?? textStyle,
+              atStyle: widget.atStyle ?? atStyle,
+              atCallback: widget.atCallback,
+              allAtMap: widget.allAtMap,
+              focusNode: widget.focusNode,
+              controller: widget.controller,
+              enabled: !_isMuted,
+              inputFormatters: widget.inputFormatters,
+              // onSubmitted: (value) {
+              //   focus();
+              //   if (null != widget.onSubmitted) widget.onSubmitted!(value);
+              // },
+            ),
+            Visibility(
+              visible: _isMuted,
+              child: Container(
+                alignment: Alignment.center,
+                constraints: BoxConstraints(minHeight: 40.h),
+                child: Text(
+                  widget.isInBlacklist
+                      ? UILocalizations.inBlacklist
+                      : (widget.isGroupMuted
+                          ? UILocalizations.groupMuted
+                          : UILocalizations.youMuted),
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: Color(0xFF999999),
+                  ),
+                ),
               ),
             ),
-          ),
+          ],
         ),
-      ],
-    ),
-  );
+      );
 
   static var textStyle = TextStyle(
     fontSize: 14.sp,
@@ -366,87 +378,97 @@ class _ChatInputBoxViewState extends State<ChatInputBoxView>
   bool get _isUserMuted =>
       widget.muteEndTime * 1000 > DateTime.now().millisecondsSinceEpoch;
 
-  Color? get _color => _isMuted ? widget.mutedIconColor : widget.iconColor;
+  Color? get _color => _isMuted ? widget.disabledColor : widget.iconColor;
 
   Widget _speakBtn() => _buildBtn(
-    icon: widget.speakIcon ?? ImageUtil.speak(color: _color),
-    onTap: _isMuted
-        ? null
-        : () {
-      setState(() {
-        _leftKeyboardButton = true;
-        _rightKeyboardButton = false;
-        _toolsVisible = false;
-        _emojiVisible = false;
-        unfocus();
-      });
-    },
-  );
+        icon: widget.speakIcon ??
+            ImageUtil.speak(
+              color: widget.enabledVoiceButton ? _color : widget.disabledColor,
+            ),
+        onTap: _isMuted || !widget.enabledVoiceButton
+            ? null
+            : () {
+                setState(() {
+                  _leftKeyboardButton = true;
+                  _rightKeyboardButton = false;
+                  _toolsVisible = false;
+                  _emojiVisible = false;
+                  unfocus();
+                });
+              },
+      );
 
   Widget _keyboardLeftBtn() => _buildBtn(
-    icon: widget.keyboardIcon ?? ImageUtil.keyboard(color: _color),
-    onTap: _isMuted
-        ? null
-        : () {
-      setState(() {
-        _leftKeyboardButton = false;
-        _toolsVisible = false;
-        _emojiVisible = false;
-        focus();
-      });
-    },
-  );
+        icon: widget.keyboardIcon ?? ImageUtil.keyboard(color: _color),
+        onTap: _isMuted
+            ? null
+            : () {
+                setState(() {
+                  _leftKeyboardButton = false;
+                  _toolsVisible = false;
+                  _emojiVisible = false;
+                  focus();
+                });
+              },
+      );
 
   Widget _keyboardRightBtn() => _buildBtn(
-    padding: emojiButtonPadding,
-    icon: widget.keyboardIcon ?? ImageUtil.keyboard(color: _color),
-    onTap: _isMuted
-        ? null
-        : () {
-      setState(() {
-        _rightKeyboardButton = false;
-        _toolsVisible = false;
-        _emojiVisible = false;
-        focus();
-      });
-    },
-  );
+        padding: emojiButtonPadding,
+        icon: widget.keyboardIcon ?? ImageUtil.keyboard(color: _color),
+        onTap: _isMuted
+            ? null
+            : () {
+                setState(() {
+                  _rightKeyboardButton = false;
+                  _toolsVisible = false;
+                  _emojiVisible = false;
+                  focus();
+                });
+              },
+      );
 
   Widget _toolsBtn() => _buildBtn(
-    icon: widget.toolsIcon ?? ImageUtil.tools(color: _color),
-    padding: toolsButtonPadding,
-    onTap: _isMuted
-        ? null
-        : () {
-      setState(() {
-        _toolsVisible = !_toolsVisible;
-        _emojiVisible = false;
-        _leftKeyboardButton = false;
-        _rightKeyboardButton = false;
-        if (_toolsVisible) {
-          unfocus();
-        } else {
-          focus();
-        }
-      });
-    },
-  );
+        icon: widget.toolsIcon ??
+            ImageUtil.tools(
+              color:
+                  widget.enabledToolboxButton ? _color : widget.disabledColor,
+            ),
+        padding: toolsButtonPadding,
+        onTap: _isMuted || !widget.enabledToolboxButton
+            ? null
+            : () {
+                setState(() {
+                  _toolsVisible = !_toolsVisible;
+                  _emojiVisible = false;
+                  _leftKeyboardButton = false;
+                  _rightKeyboardButton = false;
+                  if (_toolsVisible) {
+                    unfocus();
+                  } else {
+                    focus();
+                  }
+                });
+              },
+      );
 
   Widget _emojiBtn() => _buildBtn(
-    padding: emojiButtonPadding,
-    icon: widget.emojiIcon ?? ImageUtil.emoji(color: _color),
-    onTap: _isMuted
-        ? null
-        : () {
-      setState(() {
-        _rightKeyboardButton = true;
-        _leftKeyboardButton = false;
-        _emojiVisible = true;
-        _toolsVisible = false;
-        unfocus();
-      });
-    },
-  );
+        padding: emojiButtonPadding,
+        icon: widget.emojiIcon ??
+            ImageUtil.emoji(
+              color: widget.enabledEmojiButton ? _color : widget.disabledColor,
+            ),
+        onTap: _isMuted || !widget.enabledEmojiButton
+            ? null
+            : () {
+                setState(() {
+                  _rightKeyboardButton = true;
+                  _leftKeyboardButton = false;
+                  _emojiVisible = true;
+                  _toolsVisible = false;
+                  unfocus();
+                });
+              },
+      );
 
   Widget _buildBtn({
     required Widget icon,
