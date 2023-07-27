@@ -195,7 +195,7 @@
     },
     {
       "name": "flutter_openim_sdk",
-      "rootUri": "file:///C:/Users/Poker/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_openim_sdk-2.3.5+2",
+      "rootUri": "file:///C:/Users/Poker/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_openim_sdk-3.0.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -728,7 +728,7 @@
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2023-05-05T03:03:05.285051Z",
+  "generated": "2023-07-24T07:23:43.958049Z",
   "generator": "pub",
   "generatorVersion": "2.19.6"
 }
