@@ -341,7 +341,7 @@ class ChatItemView extends StatefulWidget {
 class _ChatItemViewState extends State<ChatItemView> {
   final _popupCtrl = CustomPopupMenuController();
 
-  bool get _isFromMsg => widget.message.sendID != OpenIM.iMManager.uid;
+  bool get _isFromMsg => widget.message.sendID != OpenIM.iMManager.userID;
 
   bool get _checked => widget.multiList.contains(widget.message);
   late StreamSubscription<bool> _keyboardSubs;
@@ -451,7 +451,7 @@ class _ChatItemViewState extends State<ChatItemView> {
           {
             child = _buildCommonItemView(
               child: ChatAtText(
-                text: widget.message.content!,
+                text: widget.message.localEx!,
                 textStyle: widget.textStyle,
                 textScaleFactor: widget.textScaleFactor,
                 patterns: widget.patterns,
@@ -460,9 +460,9 @@ class _ChatItemViewState extends State<ChatItemView> {
             );
           }
           break;
-        case MessageType.at_text:
+        case MessageType.atText:
           {
-            Map map = json.decode(widget.message.content!);
+            Map map = json.decode(widget.message.localEx!);
             var text = map['text'];
             child = _buildCommonItemView(
               child: ChatAtText(
@@ -593,7 +593,7 @@ class _ChatItemViewState extends State<ChatItemView> {
           break;
         case MessageType.card:
           {
-            var data = json.decode(widget.message.content!);
+            var data = json.decode(widget.message.localEx!);
             child = _buildCommonItemView(
               isBubbleBg: false,
               child: ChatCarteView(
@@ -603,7 +603,7 @@ class _ChatItemViewState extends State<ChatItemView> {
             );
           }
           break;
-        case MessageType.custom_face:
+        case MessageType.customFace:
           {
             var face = widget.message.faceElem;
             child = _buildCommonItemView(
@@ -689,7 +689,7 @@ class _ChatItemViewState extends State<ChatItemView> {
         isReceivedMsg: _isFromMsg,
         isSingleChat: widget.isSingleChat,
         avatarSize: widget.avatarSize ?? 42.h,
-        rightAvatar: widget.rightAvatarUrl ?? OpenIM.iMManager.uInfo.faceURL,
+        rightAvatar: widget.rightAvatarUrl ?? OpenIM.iMManager.userInfo.faceURL,
         leftAvatar: widget.leftAvatarUrl ?? widget.message.senderFaceUrl,
         leftName: widget.leftName ?? widget.message.senderNickname ?? '',
         isUnread: !widget.message.isRead!,
@@ -838,8 +838,8 @@ class _ChatItemViewState extends State<ChatItemView> {
         message: widget.message.quoteElem!.quoteMessage!,
         onTap: widget.onTapQuoteMsg,
       );
-    } else if (widget.message.contentType == MessageType.at_text) {
-      var message = widget.message.atElem!.quoteMessage;
+    } else if (widget.message.contentType == MessageType.atText) {
+      var message = widget.message.atTextElem!.quoteMessage;
       if (message != null) {
         return ChatQuoteView(
           message: message,
@@ -887,12 +887,11 @@ class _ChatItemViewState extends State<ChatItemView> {
       _isFromMsg ? widget.message.senderNickname ?? '' : UILocalizations.you;
 
   int get _haveReadCount =>
-      widget.message.attachedInfoElem?.groupHasReadInfo?.hasReadUserIDList
-          ?.length ??
+      widget.message.attachedInfoElem?.groupHasReadInfo?.hasReadCount ??
       0;
 
   int get _needReadCount =>
-      widget.message.attachedInfoElem?.groupHasReadInfo?.groupMemberCount ?? 0;
+      widget.message.attachedInfoElem?.groupHasReadInfo?.unreadCount ?? 0;
 
   bool get _haveUsableMenu =>
       widget.enabledCopyMenu ||
@@ -908,47 +907,54 @@ class _ChatItemViewState extends State<ChatItemView> {
 
   String? _parseHintText() {
     String? text;
-    if (MessageType.revoke == widget.message.contentType) {
-      text = '$_who ${UILocalizations.revokeAMsg}';
-    } else if (MessageType.advancedRevoke == widget.message.contentType) {
-      if (widget.message.isSingleChat) {
-        // 单聊
-        text = '$_who ${UILocalizations.revokeAMsg}';
-      } else {
-        // 群聊撤回包含：撤回自己消息，群组或管理员撤回其他人消息
-        var map = json.decode(widget.message.content!);
-        var info = RevokedInfo.fromJson(map);
-        if (info.revokerID == info.sourceMessageSendID) {
-          text = '$_who ${UILocalizations.revokeAMsg}';
-        } else {
-          late String revoker;
-          late String sender;
-          if (info.revokerID == OpenIM.iMManager.uid) {
-            revoker = UILocalizations.you;
-          } else {
-            revoker = info.revokerNickname!;
-          }
-          if (info.sourceMessageSendID == OpenIM.iMManager.uid) {
-            sender = UILocalizations.you;
-          } else {
-            sender = info.sourceMessageSenderNickname!;
-          }
-
-          text = sprintf(
-            UILocalizations.groupOwnerOrAdminRevokeAMsg,
-            [revoker, sender],
-          );
-        }
-      }
-    } else {
-      try {
-        var content = json.decode(widget.message.content!);
-        text = content['defaultTips'];
-      } catch (e) {
-        print('--------message content parse error----->e:$e');
-        text = json.encode(widget.message);
-      }
+    try {
+      var content = json.decode(widget.message.localEx!);
+      text = content['defaultTips'];
+    } catch (e) {
+      print('--------message content parse error----->e:$e');
+      text = json.encode(widget.message);
     }
-    return text;
+  //   if (MessageType.revoke == widget.message.contentType) {
+  //     text = '$_who ${UILocalizations.revokeAMsg}';
+  //   } else if (MessageType.advancedRevoke == widget.message.contentType) {
+  //     if (widget.message.isSingleChat) {
+  //       // 单聊
+  //       text = '$_who ${UILocalizations.revokeAMsg}';
+  //     } else {
+  //       // 群聊撤回包含：撤回自己消息，群组或管理员撤回其他人消息
+  //       var map = json.decode(widget.message.localEx!);
+  //       var info = RevokedInfo.fromJson(map);
+  //       if (info.revokerID == info.sourceMessageSendID) {
+  //         text = '$_who ${UILocalizations.revokeAMsg}';
+  //       } else {
+  //         late String revoker;
+  //         late String sender;
+  //         if (info.revokerID == OpenIM.iMManager.userID) {
+  //           revoker = UILocalizations.you;
+  //         } else {
+  //           revoker = info.revokerNickname!;
+  //         }
+  //         if (info.sourceMessageSendID == OpenIM.iMManager.userID) {
+  //           sender = UILocalizations.you;
+  //         } else {
+  //           sender = info.sourceMessageSenderNickname!;
+  //         }
+  //
+  //         text = sprintf(
+  //           UILocalizations.groupOwnerOrAdminRevokeAMsg,
+  //           [revoker, sender],
+  //         );
+  //       }
+  //     }
+  //   } else {
+  //     try {
+  //       var content = json.decode(widget.message.localEx!);
+  //       text = content['defaultTips'];
+  //     } catch (e) {
+  //       print('--------message content parse error----->e:$e');
+  //       text = json.encode(widget.message);
+  //     }
+  //   }
+  //   return text;
   }
 }

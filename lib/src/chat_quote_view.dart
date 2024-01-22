@@ -19,7 +19,7 @@ class ChatQuoteView extends StatelessWidget {
     var content;
     name = message.senderNickname;
     if (message.contentType == MessageType.text) {
-      content = message.content;
+      content = message.localEx;
     } else if (message.contentType == MessageType.picture) {
       var url1 = message.pictureElem?.snapshotPicture?.url;
       var url2 = message.pictureElem?.sourcePicture?.url;
