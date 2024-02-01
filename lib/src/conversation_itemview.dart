@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_openim_widget/flutter_openim_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'chat/match_pattern.dart';
+import 'chat/text_view.dart';
+
 final pinColors = [Color(0xFF87C0FF), Color(0xFF0060E7)];
 final deleteColors = [Color(0xFFFFC84C), Color(0xFFFFA93C)];
 final haveReadColors = [Color(0xFFC9C9C9), Color(0xFF7A7A7A)];

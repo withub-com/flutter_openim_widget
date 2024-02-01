@@ -54,3 +54,8 @@ export 'src/util/image_util.dart';
 export 'src/util/permission_util.dart';
 export 'src/util/ui_locallizations.dart';
 export 'src/util/voice_record.dart';
+export 'src/chat/match_pattern.dart';
+export 'src/util/IMUtils.dart';
+export 'src/chat_friend_relationship_hint_view.dart';
+export 'src/chat/styles.dart';
+export 'src/chat/str_ext.dart';

@@ -50,6 +50,10 @@ collection
 2.12
 file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/collection-1.17.0/
 file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/collection-1.17.0/lib/
+common_utils
+2.12
+file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/common_utils-2.1.0/
+file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/common_utils-2.1.0/lib/
 convert
 2.18
 file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/convert-3.1.1/
@@ -70,6 +74,10 @@ dbus
 2.17
 file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/dbus-0.7.10/
 file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/dbus-0.7.10/lib/
+decimal
+2.14
+file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/decimal-2.3.3/
+file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/decimal-2.3.3/lib/
 dio
 2.15
 file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/dio-5.4.0/
@@ -144,8 +152,8 @@ file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547d
 file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/flutter_keyboard_visibility_windows-1.0.0/lib/
 flutter_openim_sdk
 2.12
-file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/flutter_openim_sdk-3.4.0+2/
-file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/flutter_openim_sdk-3.4.0+2/lib/
+file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/flutter_openim_sdk-3.5.1-alpha.7+1/
+file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/flutter_openim_sdk-3.5.1-alpha.7+1/lib/
 flutter_screenutil
 2.12
 file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/flutter_screenutil-5.7.0/
@@ -310,6 +318,10 @@ qq_badge
 2.15
 file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/qq_badge-0.0.2/
 file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/qq_badge-0.0.2/lib/
+rational
+2.14
+file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/rational-2.2.2/
+file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/rational-2.2.2/lib/
 record
 2.15
 file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/record-4.4.4/

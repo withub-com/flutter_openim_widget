@@ -1,189 +1,136 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_openim_widget/flutter_openim_widget.dart';
+import 'package:flutter_openim_sdk/flutter_openim_sdk.dart';
+import 'package:flutter_openim_widget/src/util/IMUtils.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../flutter_openim_widget.dart';
+import 'chat/chat_progress_view.dart';
 
 class ChatPictureView extends StatefulWidget {
   const ChatPictureView({
     Key? key,
-    required this.msgId,
-    required this.index,
-    this.clickStream,
-    required this.isReceived,
-    this.snapshotPath,
-    this.snapshotUrl,
-    this.sourcePath,
-    this.sourceUrl,
-    this.width,
-    this.height,
-    this.widgetWidth = 100,
-    this.msgSenProgressStream,
-    this.initMsgSendProgress = 100,
+    required this.message,
+    required this.isISend,
+    this.sendProgressStream,
   }) : super(key: key);
-  final int index;
-  final Stream<int>? clickStream;
-  final String? sourcePath;
-  final String? sourceUrl;
-  final String? snapshotPath;
-  final String? snapshotUrl;
-  final double? width;
-  final double? height;
-  final double widgetWidth;
-  final String msgId;
-  final Stream<MsgStreamEv<int>>? msgSenProgressStream;
-  final int initMsgSendProgress;
-  final bool isReceived;
+  final Stream<MsgStreamEv<int>>? sendProgressStream;
+  final bool isISend;
+  final Message message;
 
   @override
-  _ChatPictureViewState createState() => _ChatPictureViewState();
+  State<ChatPictureView> createState() => _ChatPictureViewState();
 }
 
 class _ChatPictureViewState extends State<ChatPictureView> {
   String? _sourcePath;
   String? _sourceUrl;
 
-  // String? _snapshotPath;
   String? _snapshotUrl;
   late double _trulyWidth;
   late double _trulyHeight;
 
+  Message get _message => widget.message;
+
+  Widget? _child;
+
   @override
   void initState() {
-    _sourcePath = widget.sourcePath;
-    _sourceUrl = widget.sourceUrl;
-    _snapshotUrl = widget.snapshotUrl;
-    // _snapshotPath = widget.snapshotPath;
-    var w = widget.width ?? 1.0;
-    var h = widget.height ?? 1.0;
+    final picture = _message.pictureElem;
+    _sourcePath = picture?.sourcePath;
+    _sourceUrl = picture?.sourcePicture?.url;
+    _snapshotUrl = picture?.snapshotPicture?.url;
 
-    // _trulyWidth = widget.widgetWidth;
-    // _trulyHeight = _trulyWidth * h / w;
-    if (widget.widgetWidth > w) {
+    var w = picture?.sourcePicture?.width?.toDouble() ?? 1.0;
+    var h = picture?.sourcePicture?.height?.toDouble() ?? 1.0;
+
+    if (pictureWidth > w) {
       _trulyWidth = w;
       _trulyHeight = h;
     } else {
-      _trulyWidth = widget.widgetWidth;
+      _trulyWidth = pictureWidth;
       _trulyHeight = _trulyWidth * h / w;
     }
 
-    final widgetHeight = widget.widgetWidth * 1.sh / 1.sw;
+    final height = pictureWidth * 1.sh / 1.sw;
 
-    // 超长图显示为方形
-    if (_trulyHeight > 2 * widgetHeight) {
+    if (_trulyHeight > 2 * height) {
       _trulyHeight = _trulyWidth;
     }
 
-    //
-    /*if (!_isNotNull(_snapshotPath) && _isNotNull(_sourcePath)) {
-      CommonUtil.createThumbnail(
-        path: _sourcePath!,
-        minWidth: _trulyWidth,
-        minHeight: _trulyHeight,
-      ).then((path) {
-        if (!mounted) return;
-        if (null != path) {
-          setState(() {
-            _snapshotPath = path;
-          });
-        }
-      });
-    }*/
-    //
-    /* widget.clickStream?.listen((i) {
-      if (!mounted) return;
-      if (_isClickedLocation(i)) {
-        if (null != widget.onClickPic) {
-          widget.onClickPic!(_sourceUrl, _sourcePath, _tag);
-        } else {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (BuildContext context) {
-                return PicturePreview(
-                  url: _sourceUrl!,
-                  tag: _tag!,
-                  localizations: widget.localizations,
-                );
-              },
-            ),
-          );
-        }
-      }
-    });*/
+    _createChildView();
     super.initState();
   }
 
-  bool _isClickedLocation(i) => i == widget.index;
+  Future<bool> _checkingPath() async {
+    final valid = IMUtils.isNotNullEmptyStr(_sourcePath) &&
+        // await Permissions.checkStorage() &&
+        await File(_sourcePath!).exists();
+    _message.exMap['validPath_$_sourcePath'] = valid;
+    return valid;
+  }
 
-  Widget _urlView({required String url}) => ImageUtil.networkImage(
-        url: url,
+  bool? get isValidPath => _message.exMap['validPath_$_sourcePath'];
+
+  _createChildView() async {
+    if (widget.isISend &&
+        (isValidPath == true || isValidPath == null && await _checkingPath())) {
+      _child = _buildPathPicture(path: _sourcePath!);
+    } else if (IMUtils.isNotNullEmptyStr(_snapshotUrl)) {
+      _child = _buildUrlPicture(url: _snapshotUrl!);
+    } else if (IMUtils.isNotNullEmptyStr(_sourceUrl)) {
+      _child = _buildUrlPicture(url: _sourceUrl!);
+    }
+    if (null != _child) {
+      if (!mounted) return;
+      setState(() {});
+    }
+  }
+
+  Widget _buildUrlPicture({required String url}) => ImageUtil.networkImage(
+    url: url,
+    height: _trulyHeight,
+    width: _trulyWidth,
+    fit: BoxFit.fitWidth,
+  );
+
+  Widget _buildPathPicture({required String path}) => Stack(
+    children: [
+      Image(
+        image: FileImage(File(path)),
         height: _trulyHeight,
         width: _trulyWidth,
         fit: BoxFit.fitWidth,
-      );
-
-  Widget _pathView({required String path}) => Stack(
-        children: [
-          Image(
-            image: FileImage(File(path)),
-            height: _trulyHeight,
-            width: _trulyWidth,
-            fit: BoxFit.fitWidth,
-            errorBuilder: (_, error, stack) => _errorIcon(),
-          ),
-          ChatSendProgressView(
-            height: _trulyHeight,
-            width: _trulyWidth,
-            msgId: widget.msgId,
-            stream: widget.msgSenProgressStream,
-            initProgress: widget.initMsgSendProgress,
-          ),
-        ],
-      );
-
-  Widget _buildChildView() {
-    Widget? child;
-    // if (_isNotNull(_snapshotUrl)) {
-    //   child = _urlView(url: _snapshotUrl!);
-    // } else if (_isNotNull(_sourceUrl)) {
-    //   child = _urlView(url: _sourceUrl!);
-    // } else if (_isNotNull(_snapshotPath) && File(_snapshotPath!).existsSync()) {
-    //   child = _pathView(path: _snapshotPath!);
-    // } else if (_isNotNull(_sourcePath) && File(_sourcePath!).existsSync()) {
-    //   child = _pathView(path: _sourcePath!);
-    // }
-    if (widget.isReceived) {
-      if (_isNotNull(_snapshotUrl)) {
-        child = _urlView(url: _snapshotUrl!);
-      } else if (_isNotNull(_sourceUrl)) {
-        child = _urlView(url: _sourceUrl!);
-      }
-    } else {
-      /*if (_isNotNull(_snapshotPath) && File(_snapshotPath!).existsSync()) {
-        child = _pathView(path: _snapshotPath!);
-      } else*/
-      if (_isNotNull(_sourcePath) && File(_sourcePath!).existsSync()) {
-        child = _pathView(path: _sourcePath!);
-      } else if (_isNotNull(_snapshotUrl)) {
-        child = _urlView(url: _snapshotUrl!);
-      } else if (_isNotNull(_sourceUrl)) {
-        child = _urlView(url: _sourceUrl!);
-      }
-    }
-    return Container(child: child ?? _errorIcon());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var child = _buildChildView();
-    // return child;
-    return Hero(tag: widget.msgId, child: child);
-  }
+        errorBuilder: (_, error, stack) => _errorIcon(),
+      ),
+      // ChatSendProgressView(
+      //   height: _trulyHeight,
+      //   width: _trulyWidth,
+      //   msgId: widget.msgId,
+      //   stream: widget.msgSenProgressStream,
+      //   initProgress: widget.initMsgSendProgress,
+      // ),
+      ChatProgressView(
+        height: _trulyHeight,
+        width: _trulyWidth,
+        id: _message.clientMsgID!,
+        stream: widget.sendProgressStream,
+        isISend: widget.isISend,
+        type: ProgressType.picture,
+      ),
+    ],
+  );
 
   Widget _errorIcon() =>
       ImageUtil.error(width: _trulyWidth, height: _trulyHeight);
 
-  static bool _isNotNull(String? value) =>
-      null != value && value.trim().isNotEmpty;
+  @override
+  Widget build(BuildContext context) {
+    final child = ClipRRect(
+      borderRadius: borderRadius(widget.isISend),
+      child: SizedBox(width: _trulyWidth, height: _trulyHeight, child: _child),
+    );
+    return child;
+  }
 }

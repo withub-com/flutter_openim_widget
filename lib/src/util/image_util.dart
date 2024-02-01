@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_openim_widget/src/chat_emoji_view.dart';
@@ -11,10 +13,13 @@ class ImageUtil {
 
   static String imageResStr(var name) => "assets/images/$name.webp";
 
-  static AssetImage emojiImage(String key) => AssetImage(
-        ImageUtil.imageResStr(emojiFaces[key]),
-        package: _package,
-      );
+  static AssetImage emojiImage(String key) {
+    print('emojiImage------------${ImageUtil.imageResStr(emojiFaces[key])}');
+    return AssetImage(
+      ImageUtil.imageResStr(emojiFaces[key]),
+      package: _package,
+    );
+  }
 
   static Widget svg(
     String name, {
@@ -48,6 +53,21 @@ class ImageUtil {
       color: color,
       // cacheWidth: width?.toInt(),
       package: _package,
+    );
+  }
+  //加载本地webp图片
+  static Widget fileImage(
+    File file, {
+    double? width,
+    double? height,
+    BoxFit? fit,
+    Color? color,
+  }) {
+    return Image(
+      image: FileImage(file),
+      height: height,
+      width: width,
+      fit: fit,
     );
   }
 

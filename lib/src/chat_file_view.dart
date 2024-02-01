@@ -111,7 +111,6 @@ class ChatFileView extends StatelessWidget {
     required this.msgId,
     required this.fileName,
     required this.bytes,
-    required this.index,
     // required this.filePath,
     // required this.url,
     this.clickStream,
@@ -127,7 +126,6 @@ class ChatFileView extends StatelessWidget {
   final double width;
   // final String filePath;
   // final String url;
-  final int index;
   final Stream<int>? clickStream;
 
   @override

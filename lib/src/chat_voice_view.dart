@@ -192,8 +192,6 @@ import 'package:lottie/lottie.dart';
 
 /// 去掉语音播放功能
 class ChatVoiceView extends StatefulWidget {
-  final int index;
-  final Stream<int>? clickStream;
   final bool isReceived;
   final String? soundPath;
   final String? soundUrl;
@@ -202,8 +200,6 @@ class ChatVoiceView extends StatefulWidget {
 
   const ChatVoiceView({
     Key? key,
-    required this.index,
-    required this.clickStream,
     required this.isReceived,
     this.soundPath,
     this.soundUrl,

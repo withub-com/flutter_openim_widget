@@ -80,6 +80,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "common_utils",
+      "rootUri": "file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/common_utils-2.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "convert",
       "rootUri": "file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/convert-3.1.1",
       "packageUri": "lib/",
@@ -108,6 +114,12 @@
       "rootUri": "file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/dbus-0.7.10",
       "packageUri": "lib/",
       "languageVersion": "2.17"
+    },
+    {
+      "name": "decimal",
+      "rootUri": "file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/decimal-2.3.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.14"
     },
     {
       "name": "dio",
@@ -225,7 +237,7 @@
     },
     {
       "name": "flutter_openim_sdk",
-      "rootUri": "file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/flutter_openim_sdk-3.4.0+2",
+      "rootUri": "file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/flutter_openim_sdk-3.5.1-alpha.7+1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -488,6 +500,12 @@
       "languageVersion": "2.15"
     },
     {
+      "name": "rational",
+      "rootUri": "file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/rational-2.2.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.14"
+    },
+    {
       "name": "record",
       "rootUri": "file:///C:/Users/xulinyu/AppData/Local/Pub/Cache/hosted/mirror.sjtu.edu.cn%2547dart-pub%2547/record-4.4.4",
       "packageUri": "lib/",
@@ -734,7 +752,7 @@
       "languageVersion": "2.17"
     }
   ],
-  "generated": "2024-01-18T11:22:41.767132Z",
+  "generated": "2024-01-29T07:48:28.308204Z",
   "generator": "pub",
   "generatorVersion": "2.19.6"
 }

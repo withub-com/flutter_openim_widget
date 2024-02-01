@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_openim_widget/flutter_openim_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'chat/match_pattern.dart';
+import 'chat/text_view.dart';
+
 /// message content: @uid1 @uid2 xxxxxxx
 ///
 
@@ -89,15 +92,15 @@ class ChatAtText extends StatelessWidget {
     final _mapping = Map<String, MatchPattern>();
 
     patterns.forEach((e) {
-      if (e.type == PatternType.AT) {
+      if (e.type == PatternType.at) {
         _mapping[regexAt] = e;
-      } else if (e.type == PatternType.EMAIL) {
+      } else if (e.type == PatternType.email) {
         _mapping[regexEmail] = e;
-      } else if (e.type == PatternType.MOBILE) {
+      } else if (e.type == PatternType.mobile) {
         _mapping[regexMobile] = e;
-      } else if (e.type == PatternType.TEL) {
+      } else if (e.type == PatternType.tel) {
         _mapping[regexTel] = e;
-      } else if (e.type == PatternType.URL) {
+      } else if (e.type == PatternType.url) {
         _mapping[regexUrl] = e;
       } else {
         _mapping[e.pattern!] = e;
@@ -110,7 +113,7 @@ class ChatAtText extends StatelessWidget {
         .replaceAll('[', '\\[')
         .replaceAll(']', '\\]');
 
-    _mapping[regexEmoji] = MatchPattern(type: PatternType.EMOJI);
+    _mapping[regexEmoji] = MatchPattern(type: PatternType.emoji);
 
     final pattern;
 
@@ -134,7 +137,7 @@ class ChatAtText extends StatelessWidget {
               return '';
             })];
         if (mapping != null) {
-          if (mapping.type == PatternType.AT) {
+          if (mapping.type == PatternType.at) {
             String userID = matchText.replaceFirst("@", "").trim();
             if (allAtMap.containsKey(userID)) {
               matchText = '@${allAtMap[userID]} ';
@@ -150,7 +153,7 @@ class ChatAtText extends StatelessWidget {
             } else {
               inlineSpan = TextSpan(text: matchText, style: style);
             }
-          } else if (mapping.type == PatternType.EMOJI) {
+          } else if (mapping.type == PatternType.emoji) {
             inlineSpan = ImageSpan(
               ImageUtil.emojiImage(matchText),
               imageWidth: style.fontSize! * 1.4,
@@ -182,12 +185,12 @@ class ChatAtText extends StatelessWidget {
 
   _getUrl(String text, PatternType type) {
     switch (type) {
-      case PatternType.URL:
+      case PatternType.url:
         return text.substring(0, 4) == 'http' ? text : 'http://$text';
-      case PatternType.EMAIL:
+      case PatternType.email:
         return text.substring(0, 7) == 'mailto:' ? text : 'mailto:$text';
-      case PatternType.TEL:
-      case PatternType.MOBILE:
+      case PatternType.tel:
+      case PatternType.mobile:
         return text.substring(0, 4) == 'tel:' ? text : 'tel:$text';
       // case PatternType.PHONE:
       //   return text.substring(0, 4) == 'tel:' ? text : 'tel:$text';
@@ -201,23 +204,14 @@ class ChatAtText extends StatelessWidget {
   }
 }
 
-class MatchPattern {
-  PatternType type;
-
-  String? pattern;
-
-  TextStyle? style;
-
-  Function(String link, PatternType? type)? onTap;
-
-  MatchPattern({required this.type, this.pattern, this.style, this.onTap});
-}
-
-enum PatternType { AT, EMAIL, MOBILE, TEL, URL, EMOJI, CUSTOM }
 
 /// 空格@uid空格
-const regexAt = r"(@\S+\s)";
+// const regexAt = r"(@\S+\s)";
 // const regexAt = r"(\s@\S+\s)";
+
+const regexAt = r"(@\d+\s)";
+
+const regexAtAll = r'@atAllTag ';
 
 /// Email Regex - A predefined type for handling email matching
 const regexEmail = r"\b[\w\.-]+@[\w\.-]+\.\w{2,4}\b";
